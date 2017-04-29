@@ -83,9 +83,9 @@ def ressources(api_folder):
             with open(os.path.join(dirpath, file)) as f:
                 ressource = json.load(f)
             if "invalid" in test_path:
-                invalid.append(file)
+                invalid.append(ressource)
             else:
-                valid.append(file)
+                valid.append(ressource)
     return valid, invalid
 
 
