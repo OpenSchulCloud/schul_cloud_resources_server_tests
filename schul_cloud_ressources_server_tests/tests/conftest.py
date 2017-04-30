@@ -162,6 +162,3 @@ def step(function):
     _steps.append(mark_function)
     return marker_only(marker(function))
 __builtins__["step"] = step
-
-
-

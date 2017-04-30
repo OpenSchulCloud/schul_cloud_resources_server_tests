@@ -4,4 +4,3 @@ six==1.10.0       # via pytest
 appdirs==1.4.3    # via pytest
 packaging==16.8   # via pytest
 pyparsing==2.2.0  # via pytest
-schul-cloud-ressources-api-v1
