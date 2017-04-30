@@ -51,5 +51,17 @@ You can run  a single test with
     pytest --pyargs schul_cloud_ressources_server_tests.test -m step3only
 
 
+## TODO
+
+
+- generate a docker container for the server
+- generate a docker container for the tests
+- document how to embed the tests and the server in 
+  - a crawler
+  - travis build script of arbitrary language
+- create example crawler with tests
+
+
+
 
 [api]: https://github.com/schul-cloud/ressources-api-v1
