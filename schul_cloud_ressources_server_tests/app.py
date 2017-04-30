@@ -1,7 +1,8 @@
 #!/usr/bin/python3
 
 import sys
-from bottle import run, post, request, get, delete, abort
+import json
+from bottle import run, post, request, get, delete, abort, response
 
 BASE = "/v1"
 
@@ -9,6 +10,7 @@ ressources = {}
 
 @post(BASE + "/ressources")
 def add_ressource():
+    """Add a new ressource."""
     _id = str(len(ressources))
     ressources[_id] = request.body.read()
     return {"id" : _id}
@@ -16,6 +18,9 @@ def add_ressource():
 
 @get(BASE + "/ressources/<_id>")
 def get_ressource(_id):
+    """Get a ressource identified by id."""
+    if _id == "ids":
+        return get_ressource_ids()
     ressource = ressources.get(_id)
     if ressource is None:
         abort(404, "Ressource not found.")
@@ -24,8 +29,22 @@ def get_ressource(_id):
 
 
 @delete(BASE + "/ressources/<_id>")
-def get_ressource(_id):
+def delete_ressource(_id):
+    """Delete a saved ressource."""
     del ressources[_id]
+
+
+def get_ressource_ids():
+    """Return the list of current ids."""
+    response.content_type = 'application/json'
+    return json.dumps(list(ressources.keys()))
+
+
+@delete(BASE + "/ressources")
+def delete_ressources():
+    """Delete all ressources."""
+    global ressources
+    ressources = {}
 
 
 def main():

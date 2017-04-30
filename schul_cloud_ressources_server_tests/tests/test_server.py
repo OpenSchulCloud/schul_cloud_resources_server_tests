@@ -59,12 +59,50 @@ def test_deleted_ressource_is_not_available(api, valid_ressource):
     with raises(ApiException) as error:
         api.get_ressource(r1.id)
     assert error.value.status == 404
+
+
+@step
+def test_list_of_ressource_ids_is_a_list(api):
+    """The list returned by the api should be a list if strings."""
+    ids = api.get_ressource_ids()
+    assert all(isinstance(_id, str) for _id in ids)
+
+
+@step
+def test_new_resources_are_listed(api, valid_ressource):
+    """Posting new ressources adds them their ids to the list of ids."""
+    ids_before = api.get_ressource_ids()
+    r1 = api.add_ressource(valid_ressource)
+    ids_after = api.get_ressource_ids()
+    new_ids = set(ids_after) - set(ids_before)
+    assert r1.id in new_ids
+
+
+@step
+def test_ressources_listed_can_be_accessed(api):
+    """All the ids listed can be accessed."""
+    ids = api.get_ressource_ids()
+    for _id in ids[:10]:
+        api.get_ressource(_id)
+
+
+@step
+def test_delete_all_ressources_removes_ressource(api):
+    """After all ressources are deleted, they can not be accessed any more."""
+    ids = api.get_ressource_ids()
+    api.delete_ressources()
+    for _id in ids[:10]:
+        with raises(ApiException) as error:
+            api.get_ressource(_id)
+        assert error.value.status == 404
     
 
-
-
-
-
-
-
+@step
+def test_delete_ressources_deletes_posted_ressource(api, valid_ressource):
+    """A posted ressource is deleted when all ressources are deleted."""
+    r1 = api.add_ressource(valid_ressource)
+    api.delete_ressources()
+    with raises(ApiException) as error:
+        api.get_ressource(r1.id)
+    assert error.value.status == 404
 
