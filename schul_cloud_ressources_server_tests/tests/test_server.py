@@ -2,14 +2,17 @@ import requests
 from schul_cloud_ressources_api_v1.rest import ApiException
 from pytest import raises
 
+
 @step
 def test_server_is_reachable(url):
+    """There is a server behind the url."""
     result = requests.get(url)
     assert result.status_code
 
 
 @step
 def test_valid_is_not_invalid_ressource(valid_ressource, invalid_ressource):
+    """A ressource can not be valid and invalid at the same time."""
     assert valid_ressource != invalid_ressource
 
 
@@ -105,4 +108,40 @@ def test_delete_ressources_deletes_posted_ressource(api, valid_ressource):
     with raises(ApiException) as error:
         api.get_ressource(r1.id)
     assert error.value.status == 404
+
+
+@step
+def test_there_are_invalid_ressources(api, invalid_ressources):
+    """Ensure that the tests have invalid ressources to run with."""
+    assert invalid_ressources
+
+
+@step
+def test_unprocessible_entity_if_header_is_not_set(url):
+    """If the Content-Type is not set to application/json, this is communicated."""
+    response = requests.post(url + "/ressources", data="{}")
+    assert response.status_code == 415
+
+
+
+@step
+def test_bad_request_if_there_is_no_valid_json(url):
+    """If the posted object is not a valid JSON, the server notices it."""
+    response = requests.post(url + "/ressources", data="invalid json", 
+                             headers={"Content-Type":"application/json"})
+    assert response.status_code == 400
+
+
+@step
+def test_invalid_ressources_can_not_be_posted(api, invalid_ressources):
+    """If the ressources do not fit in the schema, they cannot be posted.
+
+    The error code 422 should be reeturned.
+    https://httpstatuses.com/422
+    """
+    for invalid_ressource in invalid_ressources:
+        with raises(ApiException) as error:
+            api.add_ressource(invalid_ressource)
+        assert error.value.status == 422, "Unprocessable Entity"
+
 

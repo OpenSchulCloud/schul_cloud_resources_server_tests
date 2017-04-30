@@ -12,7 +12,13 @@ ressources = {}
 def add_ressource():
     """Add a new ressource."""
     _id = str(len(ressources))
-    ressources[_id] = request.body.read()
+    try:
+        ressource = request.json
+    except json.JSONDecodeError:
+        abort(400, "The requet body is not a valid JSON object.")
+    if ressource is None:
+        abort(415, "JSON is expected.")
+    ressources[_id] = ressource
     return {"id" : _id}
 
 
