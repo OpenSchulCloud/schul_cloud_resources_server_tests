@@ -46,7 +46,9 @@ one test after the other.
 `step3` runs the first, second and third test  
 ...
 
+You can run  a single test with
 
+    pytest --pyargs schul_cloud_ressources_server_tests.test -m step3only
 
 
 

@@ -118,7 +118,10 @@ def test_there_are_invalid_ressources(api, invalid_ressources):
 
 @step
 def test_unprocessible_entity_if_header_is_not_set(url):
-    """If the Content-Type is not set to application/json, this is communicated."""
+    """If the Content-Type is not set to application/json, this is communicated.
+
+    https://httpstatuses.com/415
+    """
     response = requests.post(url + "/ressources", data="{}")
     assert response.status_code == 415
 
@@ -126,7 +129,10 @@ def test_unprocessible_entity_if_header_is_not_set(url):
 
 @step
 def test_bad_request_if_there_is_no_valid_json(url):
-    """If the posted object is not a valid JSON, the server notices it."""
+    """If the posted object is not a valid JSON, the server notices it.
+
+    https://httpstatuses.com/400
+    """
     response = requests.post(url + "/ressources", data="invalid json", 
                              headers={"Content-Type":"application/json"})
     assert response.status_code == 400
@@ -136,7 +142,7 @@ def test_bad_request_if_there_is_no_valid_json(url):
 def test_invalid_ressources_can_not_be_posted(api, invalid_ressources):
     """If the ressources do not fit in the schema, they cannot be posted.
 
-    The error code 422 should be reeturned.
+    The error code 422 should be returned.
     https://httpstatuses.com/422
     """
     for invalid_ressource in invalid_ressources:

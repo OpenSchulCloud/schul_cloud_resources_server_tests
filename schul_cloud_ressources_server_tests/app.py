@@ -12,11 +12,15 @@ ressources = {}
 def add_ressource():
     """Add a new ressource."""
     _id = str(len(ressources))
+    print(request.body.read())
     try:
         ressource = request.json
     except json.JSONDecodeError:
-        abort(400, "The requet body is not a valid JSON object.")
+        # this can be removed with later releases of bottle
+        # https://github.com/bottlepy/bottle/blob/41ed6965de9bf7d0060ffd8245bf65ceb616e26b/bottle.py#L1292
+        abort(400, "The request body is not a valid JSON object.")
     if ressource is None:
+        print(ressource)
         abort(415, "JSON is expected.")
     ressources[_id] = ressource
     return {"id" : _id}

@@ -150,6 +150,8 @@ _steps = []
 def step(function):
     """Allow pytest -m stepX to run test up to a certain number."""
     step_number = len(_steps) + 1
+    step_only_marker = "step{}only".format(step_number)
+    marker_only = getattr(pytest.mark, step_only_marker)
     step_marker = "step{}".format(step_number)
     marker = getattr(pytest.mark, step_marker)
     def mark_function(marker):
@@ -158,7 +160,7 @@ def step(function):
     for mark_step in _steps:
         mark_step(marker)
     _steps.append(mark_function)
-    return marker(function)
+    return marker_only(marker(function))
 __builtins__["step"] = step
 
 
