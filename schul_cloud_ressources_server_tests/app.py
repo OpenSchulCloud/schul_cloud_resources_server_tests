@@ -9,13 +9,14 @@ ressources = {}
 
 @post(BASE + "/ressources")
 def add_ressource():
-    ressources[""] = request.body.read()
-    return {"id" : ""}
+    _id = str(len(ressources))
+    ressources[_id] = request.body.read()
+    return {"id" : _id}
 
 
-@get(BASE + "/ressources/")
-def get_ressource():
-    return ressources[""]
+@get(BASE + "/ressources/<_id>")
+def get_ressource(_id):
+    return ressources[_id]
 
 def main():
     port = (int(sys.argv[1]) if len(sys.argv) >= 2 else 8080)

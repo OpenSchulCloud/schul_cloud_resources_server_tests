@@ -71,8 +71,8 @@ def api_folder(api_zip_file, api_temp_dir):
 
 
 @pytest.fixture(scope="module")
-def ressources(api_folder):
-    """Return a list of valid ressoruces useable by tests."""
+def _ressources(api_folder):
+    """Return a list of valid and a list of invalid ressources useable by tests."""
     valid = []
     invalid = []
     base_folder = os.path.join(api_folder, RESSOURCES_EXAMPLES_BASE_PATH)
@@ -89,19 +89,31 @@ def ressources(api_folder):
     return valid, invalid
 
 
+@pytest.fixture(scope="module")
+def valid_ressources(_ressources):
+    """Return a list of valid ressoruces useable by tests."""
+    return _ressources[0]
+
+
+@pytest.fixture(scope="module")
+def invalid_ressources(_ressources):
+    """Return a list of invalid ressoruces useable by tests."""
+    return _ressources[1]
+
+
 # https://docs.pytest.org/en/latest/fixture.html#parametrizing-fixtures
 @pytest.fixture(scope="module",
                 params=list(range(NUMBER_OF_VALID_RESSOURCES)))
-def valid_ressource(request, ressources):
+def valid_ressource(request, valid_ressources):
     """Return a valid ressource."""
-    return ressources[0][request.param % len(ressources[0])]
+    return valid_ressources[request.param % len(valid_ressources)]
 
 
 @pytest.fixture(scope="module",
                 params=list(range(NUMBER_OF_INVALID_RESSOURCES)))
-def invalid_ressource(request, ressources):
+def invalid_ressource(request, invalid_ressources):
     """Return an invalid ressource."""
-    return ressources[1][request.param % len(ressources[1])]
+    return invalid_ressources[request.param % len(invalid_ressources)]
 
 
 def pytest_addoption(parser):
@@ -131,4 +143,23 @@ def client(url):
 def api(client):
     """The api to use to test the server."""
     return RessourceApi(client)
+
+
+_steps = []
+
+def step(function):
+    """Allow pytest -m stepX to run test up to a certain number."""
+    step_number = len(_steps) + 1
+    step_marker = "step{}".format(step_number)
+    marker = getattr(pytest.mark, step_marker)
+    def mark_function(marker):
+        current_function = function.__globals__[function.__name__] # KeyError: do not use step twice
+        function.__globals__[function.__name__] = marker(current_function)
+    for mark_step in _steps:
+        mark_step(marker)
+    _steps.append(mark_function)
+    return marker(function)
+__builtins__["step"] = step
+
+
 

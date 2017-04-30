@@ -29,6 +29,25 @@ If you test the running server, make sure to authenticate in a way that does not
 
     pytest --pyargs schul_cloud_ressources_server_tests.test --url=http://localhost:8080/v1/
 
+`http://localhost:8080/v1/` is the default url.
+
+### Steps for Implementation
+
+If you want to implement your serverm you can follow the TDD steps to implement
+one test after the other.
+
+    pytest --pyargs schul_cloud_ressources_server_tests.test -m step1
+    pytest --pyargs schul_cloud_ressources_server_tests.test -m step2
+    pytest --pyargs schul_cloud_ressources_server_tests.test -m step3
+    ...
+
+`step1` runs the first test  
+`step2` runs the first and the second test  
+`step3` runs the first, second and third test  
+...
+
+
+
 
 
 [api]: https://github.com/schul-cloud/ressources-api-v1
