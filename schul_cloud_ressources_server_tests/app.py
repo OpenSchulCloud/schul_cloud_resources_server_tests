@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 import sys
-from bottle import run, post, request, get
+from bottle import run, post, request, get, delete, abort
 
 BASE = "/v1"
 
@@ -16,7 +16,17 @@ def add_ressource():
 
 @get(BASE + "/ressources/<_id>")
 def get_ressource(_id):
-    return ressources[_id]
+    ressource = ressources.get(_id)
+    if ressource is None:
+        abort(404, "Ressource not found.")
+        return
+    return ressource
+
+
+@delete(BASE + "/ressources/<_id>")
+def get_ressource(_id):
+    del ressources[_id]
+
 
 def main():
     port = (int(sys.argv[1]) if len(sys.argv) >= 2 else 8080)
