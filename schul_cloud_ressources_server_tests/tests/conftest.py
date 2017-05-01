@@ -18,6 +18,7 @@ import zipfile
 import json
 import shutil
 import os
+from schul_cloud_ressources_api_v1.configuration import Configuration
 from schul_cloud_ressources_api_v1.rest import ApiException
 from schul_cloud_ressources_api_v1 import ApiClient, RessourceApi
 from schul_cloud_ressources_api_v1.schema import get_valid_examples, get_invalid_examples
@@ -58,11 +59,57 @@ def pytest_addoption(parser):
     """Add options to pytest.
 
     This adds the options for
-    - url
-
+    - url to store the value
+    - token to add the token to a list
+    - basic to add the credentials to a list
+    - noauth if you do not want to test without authentication
     """
     parser.addoption("--url", action="store", default="http://localhost:8080/v1/",
         help="url: the url of the server api to connect to")
+    parser.addoption("--noauth", action="store", default="true",
+        help="noauth: whether to connect without authentication")
+    parser.addoption("--basic", action="append", default=[],
+        help="basic: list of basic authentications to use")
+    parser.addoption("--apikey", action="append", default=[],
+        help="apikey: list of api key authentications to use")
+
+def pytest_generate_tests(metafunc):
+    """Generate parameters.
+
+    - _auth a list of authentication mechanisms
+    """
+    if '_auth' in metafunc.fixturenames:
+        auth = ([None] if metafunc.config.option.noauth == "true" else []) + \
+               [("basic", a) for a in metafunc.config.option.basic] + \
+               [("apikey", k) for k in metafunc.config.option.apikey]
+        metafunc.parametrize("_auth", auth)
+
+
+def _authenticate(auth):
+    """Return a generator for setting the configuration."""
+    configuration = Configuration()
+    if auth is None:
+        yield None
+    elif auth[0] == "basic":
+        configuration.username, configuration.password = auth[1].split(":", 1)
+        yield ["basic"]
+        configuration.username = configuration.password = ""
+    elif auth[0] == "apikey":
+        split = auth[1].split(":", 1)
+        configuration.api_key["api_key"] = split[0]
+        if len(split) == 2:
+            configuration.api_key_prefix["api_key"] = split[1]
+        yield ["api_key"]
+        configuration.api_key.pop("api_key")
+        configuration.api_key.pop("api_key")
+    else:
+        raise ValueError(auth)
+
+
+@pytest.fixture
+def auth_settings(_auth):
+    """Authenticate the request."""
+    return _authenticate(_auth)
 
 
 @pytest.fixture
@@ -83,7 +130,6 @@ def api(client):
     return RessourceApi(client)
 
 
-_steps = []
 
 def step(function):
     """Allow pytest -m stepX to run test up to a certain number."""
@@ -93,10 +139,11 @@ def step(function):
     step_marker = "step{}".format(step_number)
     marker = getattr(pytest.mark, step_marker)
     def mark_function(marker):
-        current_function = function.__globals__[function.__name__] # KeyError: do not use step twice
-        function.__globals__[function.__name__] = marker(current_function)
+        marker(function)
     for mark_step in _steps:
         mark_step(marker)
     _steps.append(mark_function)
     return marker_only(marker(function))
+_steps = []
+
 __builtins__["step"] = step

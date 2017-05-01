@@ -173,5 +173,68 @@ def test_posting_and_deleting_a_ressource_leaves_other_ressource_intact(
         assert ressource == valid_ressources[0]
 
 
+class TestAuthentication:
+    """Test the authentication mechanism.
 
+    This includes:
+
+    - different users can not see eachother
+    - same users can post with different authentication machanisms
+    - unauthenticated user can not see anything from other users
+    - invalid username, password, api key
+    - malformed Authorize header
+    """
+
+    @step
+    def test_user_provided_credentians(all_credentials):
+        """To make the tests work, the user should provide credentials.""""
+        assert len(all_credentials) >= 2
+
+    @step
+    class TestTest:
+        """Test the tests"""
+
+        def test_users_are_always_unequal(self, user1, user2):
+            """user1 and user2 are never the same."""
+            assert user1.name != user2.name
+
+        def test_different_auths_have_the_same_name(self, user1, user1_auth2):
+            """user1 is the same user as user1_auth2 but uses a different
+            authentication mechanism"""
+            assert user1.name == user1_auth2.name
+            assert user1.auth != user1.auth2.auth
+
+    @step
+    def test_cannot_cross_post(self, user1, user2, a_valid_ressource):
+        """Two disjoint users can not access each others objects."""
+        r = user1.api.add_ressource(a_valid_ressource)
+        ids = user2.api.get_ressource_ids()
+        assert r.id not in ids
+
+    @step
+    def test_cannot_cross_delete(self, user1, user2, a_valid_ressource):
+        """Two users can not delete each other's ressources."""
+        r = user1.api.add_ressource(a_valid_ressource)
+        try:
+            user2.api.delete_ressource(r.id)
+        except ApiException:
+            pass
+        ressource = user1.api.get_ressource(r.id)
+        assert ressource == a_valid_resssource
+
+    def assertSameIds(self, auth1, auth2):
+        """Make sure the ids are the same."""
+        ids1 = auth1.api.get_ressource_ids()
+        ids2 = auth2.api.get_ressource_ids()
+        assert ids1 == ids2
+
+    @step
+    def test_same_user_can_view_ressources_with_different_auth(
+            self, user1, user1_auth2, a_valid_ressource):
+        """Regardless of the authentication mechanism, the user can view the ressource."""
+        self.assertSameIds(user1, user1_auth2)
+        r = user1.api.add_ressource(a_valid_ressource)
+        self.assertSameIds(user1, user1_auth2)
+        user1_auth2.delete_ressource(r.id)
+        self.assertSameIds(user1, user1_auth2)
 
