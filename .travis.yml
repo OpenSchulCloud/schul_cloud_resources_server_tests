@@ -16,10 +16,13 @@ install:
 - pip install -r test-requirements.txt twine wheel
 
 script:
-- python setup.py sdist bdist_wheel
+# test repository
 - pytest
+# test installation
+- python setup.py sdist bdist_wheel
 - pip install dist/*.whl
-- ( cd / ; pytest -m schul_cloud_ressources_server_tests.tests )
+- ( cd / ; pytest --pyargs schul_cloud_ressources_server_tests.tests )
+
 before_deploy:
 - scripts/create_pypi_login_for_travis.sh
 
