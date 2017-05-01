@@ -1,6 +1,14 @@
 Schul-Cloud Ressources Server Tests
 ===================================
 
+.. image:: https://travis-ci.org/schul-cloud/schul_cloud_ressources_server_tests.svg?branch=master
+   :target: https://travis-ci.org/schul-cloud/schul_cloud_ressources_server_tests
+   :alt: Build Status
+
+.. image:: https://badge.fury.io/py/schul-cloud-ressources-server-tests.svg
+   :target: https://pypi.python.org/pypi/schul-cloud-ressources-server-tests
+   :alt: Python Package Index
+
 This repository contains
 
 - a server to test scrapers against
@@ -13,10 +21,21 @@ Using `pip`, you can install all dependencies like this:
 
 .. code:: shell
 
-    pip install --user -r requirements.txt test-requrements.txt
+    pip install schul_cloud_ressources_server_tests
+
+When you are done, you can import the package.
+
+.. code:: Python
+
+    import schul_cloud_ressources_server_tests
+
+Usage
+-----
+
+This section describes how to use the server and the tests.
 
 Server
-------
+~~~~~~
 
 You can find the API_ definition.
 The server serves according to the API_.
@@ -28,8 +47,10 @@ To start the server, run
 
     python3 -m schul_cloud_ressources_server_tests.app
 
+The server should appear at http://localhost:8080/v1.
+
 Tests
------
+~~~~~
 
 You always test against the running server.
 **Tests may delete everyting you can reach.**
