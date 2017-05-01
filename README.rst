@@ -65,7 +65,7 @@ If you test the running server, make sure to authenticate in a way that does not
 Steps for Implementation
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you want to implement your serverm you can follow the TDD steps to implement
+If you want to implement your server you can follow the TDD steps to implement
 one test after the other.
 
 .. code:: shell
