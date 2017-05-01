@@ -18,7 +18,7 @@ def add_ressource():
     _id = str(len(ressources))
     try:
         ressource = request.json
-    except json.JSONDecodeError:
+    except (ValueError, TypeError):
         # this can be removed with later releases of bottle
         # https://github.com/bottlepy/bottle/blob/41ed6965de9bf7d0060ffd8245bf65ceb616e26b/bottle.py#L1292
         abort(400, "The request body is not a valid JSON object.")
