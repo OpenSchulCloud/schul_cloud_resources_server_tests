@@ -1,11 +1,7 @@
 # coding: utf-8
 
 """
-    Schul-Cloud Content API
-
-    This is the specification for the content of Schul-Cloud. You can find more information in the repository <https://github.com/schul-cloud/ressources-api-v1>. 
-
-    OpenAPI spec version: 1.0.0
+Schul-Cloud Ressources API Server Tests
 """
 
 
@@ -13,7 +9,7 @@ import sys
 import os
 from setuptools import setup, find_packages
 
-NAME = "schul_cloud_ressources_api_v1"
+NAME = "schul_cloud_ressources_server_tests"
 VERSION = "1.0"
 if os.environ.get("TRAVIS_BUILD_NUMBER"):
     # same as in ../generate_python_client.sh
