@@ -86,6 +86,44 @@ You can run  a single test with
 
     pytest --pyargs schul_cloud_ressources_server_tests.test -m step3only
 
+Test Authentication
+~~~~~~~~~~~~~~~~~~~
+
+The test server supports api key authentication and basic authentication.
+If you test authentication over the internet, using https protects the secrets.
+
+By default the test server accepts authentication with 
+
+- no authentication
+- basic:
+
+  - user ``valid1@schul-cloud.org`` password ``123abc``
+  - user ``valid2@schul-cloud.org`` password ``supersecure``
+- api key: ``abcdefghijklmn`` for the user ``valid@schul-cloud.org``.
+  The client does not send the user name to the server.
+
+To test these, you can add the ``--basic`` and ``--apikey``
+parameters several times to the tests.
+The ``--noauth=true`` parameter is default.
+If the api only accepts authenticated requests, set ``--noauth=false``.
+
+.. code:: Python
+
+    pytest --pyargs schul_cloud_ressources_server_tests.test \
+           --basic=valid1@schul-cloud.org:123abc \
+           --basic=valid2@schul-cloud.org:supersecure \
+           --apikey=valid1@schul-cloud.org:abcdefghijklmn \
+           --noauth=true
+
+All tests are run with the different authentication options.
+If we have several ways to authenticate, test if the user sees the other posts.
+
+It is assumed, that adding ``invalid`` to the password,
+user name and api key will make it invalid.
+Tests use the invalid credentials to test the server behavior in rejected cases.
+
+
+
 
 TODO
 ----
