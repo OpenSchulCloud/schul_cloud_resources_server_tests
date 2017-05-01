@@ -151,3 +151,27 @@ def test_invalid_ressources_can_not_be_posted(api, invalid_ressources):
         assert error.value.status == 422, "Unprocessable Entity"
 
 
+@step
+def deleting_and_adding_a_ressource_creates_a_new_id(api, valid_ressorce):
+    """When a ressource is added and deleted and added,
+    the id of existing ressources are not taken."""
+    ids = [api.add_ressource(valid_ressource).id for i in range(4)]
+    api.delete_ressource(ids[1])
+    r = api.add_ressource(valid_ressource)
+    assert r.id not in ids
+
+
+@step
+def test_posting_and_deleting_a_ressource_leaves_other_ressource_intact(
+        api, valid_ressources):
+    """When several ressoruces are posted, they are left intact if reposted."""
+    ids = [api.add_ressource(valid_ressources[0]).id for i in range(4)]
+    api.delete_ressource(ids.pop(2))
+    r = api.add_ressource(valid_ressources[1])
+    for _id in ids:
+        ressource = api.get_ressource(_id)
+        assert ressource == valid_ressources[0]
+
+
+
+
