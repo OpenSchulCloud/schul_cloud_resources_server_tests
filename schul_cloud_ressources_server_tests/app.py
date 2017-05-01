@@ -10,12 +10,15 @@ BASE = "/v1"
 
 # global variables
 ressources = {}
+last_id = 0
 
 
 @post(BASE + "/ressources")
 def add_ressource():
     """Add a new ressource."""
-    _id = str(len(ressources))
+    global last_id
+    _id = str(last_id)
+    last_id += 1
     try:
         ressource = request.json
     except (ValueError, TypeError):
