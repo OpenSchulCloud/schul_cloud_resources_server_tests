@@ -91,15 +91,31 @@ Test Authentication
 
 The test server supports api key authentication and basic authentication.
 If you test authentication over the internet, using https protects the secrets.
+Thus, an example test call to your api could look like this:
 
-By default the test server accepts authentication with 
+.. code:: Python
+
+    pytest --pyargs schul_cloud_ressources_server_tests.test \
+           --url=http://url.to/your/server \
+           --noauth=false --basic=username:password
+
+If you have an api key, you can test that the server works.
+Do not forget the ``:`` before the api key.
+
+.. code:: Python
+
+    pytest --pyargs schul_cloud_ressources_server_tests.test \
+           --url=http://url.to/your/server \
+           --noauth=false --apikey=:apikey
+
+By default the test server accepts authentication with several credentials
 
 - no authentication
 - basic:
 
   - user ``valid1@schul-cloud.org`` password ``123abc``
   - user ``valid2@schul-cloud.org`` password ``supersecure``
-- api key: ``abcdefghijklmn`` for the user ``valid@schul-cloud.org``.
+- api key: ``abcdefghijklmn`` for the user ``valid1@schul-cloud.org``.
   The client does not send the user name to the server.
 
 To test these, you can add the ``--basic`` and ``--apikey``
