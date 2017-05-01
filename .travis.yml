@@ -28,6 +28,7 @@ deploy:
   script: scripts/deploy.sh
   on:
     branch: master
+    condition: "$TRAVIS_PYTHON_VERSION" == "3.5"
   repo: schul-cloud/schul_cloud_ressources_server_tests
   skip_cleanup: true
 
