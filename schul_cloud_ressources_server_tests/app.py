@@ -47,23 +47,19 @@ def get_ressources():
     If authentication failed, this aborts the execution with
     401 Unauthorized.
     """
-    print(repr(request.environ.get('HTTP_AUTHORIZATION','')))
     basic = request.auth
     if basic:
         username, password = basic
-        print("username", repr(username), "password", repr(password))
         if passwords.get(username) != password:
             abort(401, BASIC_ERROR)
     else:
         api_key = get_api_key()
-        print("api_key", repr(api_key))
         if api_key is not None:
             username = api_keys.get(api_key)
             if username is None:
                 abort(401, API_KEY_ERROR)
         else:
             username = None
-    print("username", username)
     return _ressources[username]
 
 
