@@ -11,6 +11,6 @@ before_script:
 
 script:
 # test the server with the url and credentials
-- python -m schul_cloud_ressources_server_tests.tests \
-         --url=http://localhost:8080/v1
+- python -m schul_cloud_ressources_server_tests.tests   \
+         --url=http://localhost:8080/v1                 \
          --basic=valid1@schul-cloud.org:123abc
