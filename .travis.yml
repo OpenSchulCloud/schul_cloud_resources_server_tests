@@ -2,7 +2,7 @@ language: generic
 
 install:
 # install the package
-- pip install schul_cloud_ressources_server_tests
+- pip install --user schul_cloud_ressources_server_tests
 
 before_script:
 # start the server you want to test
