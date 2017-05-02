@@ -1,7 +1,7 @@
 import requests
 from schul_cloud_ressources_api_v1.rest import ApiException
 from pytest import raises
-
+import pytest
 
 @step
 def test_server_is_reachable(url):
@@ -258,4 +258,21 @@ class TestAuthentication:
         self.assertSameIds(user1, user1_auth2)
         user1_auth2.api.delete_ressource(r.id)
         self.assertSameIds(user1, user1_auth2)
+
+    @step
+    @pytest.mark.parametrize("action", [
+            lambda api, res: api.add_ressource(res),
+            lambda api, res: api.get_ressource_ids(),
+            lambda api, res: api.delete_ressource("64682437"),
+            lambda api, res: api.get_ressource("tralala"),
+            lambda api, res: api.delete_ressources()
+        ])
+    def test_invalid_user_can_not_access_the_api(
+            self, action, invalid_user, a_valid_ressource):
+        """The invalid user gets a 401 unauthorized all the time."""
+        with raises(ApiException) as error:
+            action(invalid_user.api, a_valid_ressource)
+        assert error.value.status == 401
+
+
 

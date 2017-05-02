@@ -107,28 +107,53 @@ def get_credentials(metafunc):
 def pytest_generate_tests(metafunc):
     """Generate parameters.
 
-    - _auth a list of authentication mechanisms
+    The authentication parameters require special handling
+    to create nice test cases.
     """
     if "all_credentials"  in metafunc.fixturenames:
         metafunc.parametrize("all_credentials", [get_credentials(metafunc)])
     if "_user2" in metafunc.fixturenames and \
-       "_user1_auth2" in metafunc.fixturenames:
-       raise NotImplementedError()
+        "_user1_auth2" in metafunc.fixturenames:
+        raise NotImplementedError()
     elif "_user1" in metafunc.fixturenames and \
-       "_user2" in metafunc.fixturenames:
-       credentials = get_credentials(metafunc)
-       params = [(u1, u2) for u1 in credentials for u2 in credentials
-                 if u1[1] != u2[1]]
-       metafunc.parametrize("_user1,_user2", params)
+        "_user2" in metafunc.fixturenames:
+        credentials = get_credentials(metafunc)
+        params = [(u1, u2) for u1 in credentials for u2 in credentials
+                  if u1[1] != u2[1]]
+        metafunc.parametrize("_user1,_user2", params)
     elif "_user1" in metafunc.fixturenames and \
-       "_user1_auth2" in metafunc.fixturenames:
-       credentials = get_credentials(metafunc)
-       params = [(u1, u2) for u1 in credentials for u2 in credentials
-                 if u1[1] == u2[1] and u1[2] != u2[2]]
-       metafunc.parametrize("_user1,_user1_auth2", params)
+        "_user1_auth2" in metafunc.fixturenames:
+        credentials = get_credentials(metafunc)
+        params = [(u1, u2) for u1 in credentials for u2 in credentials
+                  if u1[1] == u2[1] and u1[2] != u2[2]]
+        metafunc.parametrize("_user1,_user1_auth2", params)
     elif "_user1" in metafunc.fixturenames:
         credentials = get_credentials(metafunc)
         metafunc.parametrize("_user1", credentials)
+    if "_invalid_user" in metafunc.fixturenames:
+        credentials = get_credentials(metafunc)
+        invalid_credentials = [
+            ("apikey", "", ""), # empty api key
+            ("apikey", "", ""), # empty username and password
+        ]
+        if not ("noauth", None, None) in credentials:
+            invalid_credentials.append(("noauth", None, None))
+        for cred in credentials:
+            if cred[0] == "noauth": continue
+            # switch username and password
+            invalid_credentials.append(("apikey", cred[2], cred[1]))
+            invalid_credentials.append(("basic", cred[2], cred[1]))
+            # add invalid somewhere
+            invalid_credentials.append(("apikey", "invalid" + cred[1], cred[2]))
+            invalid_credentials.append(("apikey", cred[1], "invalid" + cred[2]))
+            invalid_credentials.append(("basic", "invalid" + cred[1], cred[2]))
+            invalid_credentials.append(("basic", cred[1], "invalid" + cred[2]))
+            if cred[0] == "basic":
+                # empty password or user name
+                invalid_credentials.append(("basic", cred[1], ""))
+                invalid_credentials.append(("basic", "", cred[2]))
+        metafunc.parametrize("_invalid_user", invalid_credentials)
+
 
 class User(object):
     """The user object for the tests.
@@ -192,6 +217,12 @@ def user1_auth2(_user1_auth2, _api):
 def user2(_user2, _api):
     """Return a user for the api with credentials."""
     return User(_api, *_user2)
+
+
+@pytest.fixture
+def invalid_user(_invalid_user, _api):
+    """Return an invalid user."""
+    return User(_api, *_invalid_user)
 
 
 @pytest.fixture
