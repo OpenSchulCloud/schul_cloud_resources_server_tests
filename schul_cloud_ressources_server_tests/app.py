@@ -93,7 +93,8 @@ def get_ressource(_id):
 def delete_ressource(_id):
     """Delete a saved ressource."""
     ressources = get_ressources()
-    ressources.pop(_id)
+    if ressources.pop(_id, None) is None:
+        abort(404, "Ressource not found.")
 
 
 def get_ressource_ids():

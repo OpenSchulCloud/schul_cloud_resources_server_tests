@@ -98,7 +98,7 @@ def test_delete_all_ressources_removes_ressource(api):
         with raises(ApiException) as error:
             api.get_ressource(_id)
         assert error.value.status == 404
-    
+
 
 @step
 def test_delete_ressources_deletes_posted_ressource(api, valid_ressource):
@@ -107,6 +107,16 @@ def test_delete_ressources_deletes_posted_ressource(api, valid_ressource):
     api.delete_ressources()
     with raises(ApiException) as error:
         api.get_ressource(r1.id)
+    assert error.value.status == 404
+
+
+@step
+def test_delete_ressource_can_not_be_found_by_delete(api, valid_ressource):
+    """When a ressource is deleted, it can not be found."""
+    r1 = api.add_ressource(valid_ressource)
+    api.delete_ressource(r1.id)
+    with raises(ApiException) as error:
+        api.delete_ressource(r1.id)
     assert error.value.status == 404
 
 
