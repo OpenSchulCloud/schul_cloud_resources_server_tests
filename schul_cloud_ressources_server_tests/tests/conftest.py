@@ -134,24 +134,30 @@ def pytest_generate_tests(metafunc):
         credentials = get_credentials(metafunc)
         invalid_credentials = [
             ("apikey", "", ""), # empty api key
-            ("apikey", "", ""), # empty username and password
+            ("basic", "", ""), # empty username and password
         ]
         if not ("noauth", None, None) in credentials:
             invalid_credentials.append(("noauth", None, None))
         for cred in credentials:
-            if cred[0] == "noauth": continue
-            # switch username and password
-            invalid_credentials.append(("apikey", cred[2], cred[1]))
-            invalid_credentials.append(("basic", cred[2], cred[1]))
-            # add invalid somewhere
-            invalid_credentials.append(("apikey", "invalid" + cred[1], cred[2]))
-            invalid_credentials.append(("apikey", cred[1], "invalid" + cred[2]))
-            invalid_credentials.append(("basic", "invalid" + cred[1], cred[2]))
-            invalid_credentials.append(("basic", cred[1], "invalid" + cred[2]))
             if cred[0] == "basic":
                 # empty password or user name
                 invalid_credentials.append(("basic", cred[1], ""))
                 invalid_credentials.append(("basic", "", cred[2]))
+                invalid_credentials.append(("basic", "invalid" + cred[1], cred[2]))
+                invalid_credentials.append(("basic", cred[1], "invalid" + cred[2]))
+                invalid_credentials.append(("basic", cred[2], cred[1]))
+                invalid_credentials.append(("apikey", None, cred[1]))
+                invalid_credentials.append(("apikey", None, cred[2]))
+            elif cred[0] == "apikey":
+                invalid_credentials.append(("apikey", None, cred[1]))
+                invalid_credentials.append(("basic", cred[2], cred[1]))
+                invalid_credentials.append(("basic", cred[1], cred[2]))
+                invalid_credentials.append(("apikey", None, cred[1] + "invalid"))
+                invalid_credentials.append(("apikey", None, cred[2] + "invalid"))
+                invalid_credentials.append(("basic", cred[2], cred[1] + "invalid"))
+                invalid_credentials.append(("basic", cred[1], cred[2] + "invalid"))
+                invalid_credentials.append(("basic", "invalid" + cred[2], cred[1]))
+                invalid_credentials.append(("basic", "invalid" + cred[1], cred[2]))
         metafunc.parametrize("_invalid_user", invalid_credentials)
 
 
@@ -198,7 +204,7 @@ class User(object):
 
     def __repr__(self):
         """A string representation."""
-        return "User(api, {}, {}, {})".format(self._auth_type, self._name, self._secret)
+        return "User(api, {}, {}, {})".format(self._auth_type, repr(self._name), repr(self._secret))
 
 
 @pytest.fixture

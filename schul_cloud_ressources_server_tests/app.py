@@ -4,7 +4,7 @@ import json
 import jsonschema
 import base64
 from schul_cloud_ressources_api_v1.schema import validate_ressource, ValidationFailed
-from bottle import run, post, request, get, delete, abort, response
+from bottle import run, post, request, get, delete, abort, response, tob, touni
 
 # configuration constants
 BASE = "/v1"
@@ -31,7 +31,10 @@ def get_api_key():
     if not header: return
     method, data = header.split(None, 1)
     if method.lower() != 'api-key': return
-    return base64.b64decode(data[4:].encode()).decode()
+    return touni(base64.b64decode(tob(data[4:])))
+
+BASIC_ERROR = "Could not do basic authentication. Wrong username or password."
+API_KEY_ERROR = "Could not authenticate using the given api key."
 
 def get_ressources():
     """Return the ressources of the authenticated user.
@@ -39,17 +42,23 @@ def get_ressources():
     If authentication failed, this aborts the execution with
     401 Unauthorized.
     """
+    print(repr(request.environ.get('HTTP_AUTHORIZATION','')))
     basic = request.auth
     if basic:
         username, password = basic
-        if passwords[username] != password:
-            abort(401, "Could not do basic authentication. Wrong username or password.")
+        print("username", repr(username), "password", repr(password))
+        if passwords.get(username) != password:
+            abort(401, BASIC_ERROR)
     else:
         api_key = get_api_key()
-        if api_key:
-            username = api_keys[api_key]
+        print("api_key", repr(api_key))
+        if api_key is not None:
+            username = api_keys.get(api_key)
+            if username is None:
+                abort(401, API_KEY_ERROR)
         else:
             username = None
+    print("username", username)
     return _ressources[username]
 
 
