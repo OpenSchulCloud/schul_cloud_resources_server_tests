@@ -35,7 +35,7 @@ def get_api_key():
         method, data = header.split(None, 1)
         if method.lower() != 'api-key': return
         return touni(base64.b64decode(tob(data[4:])))
-    except ValueError:
+    except (ValueError, TypeError):
         abort(401, HEADER_ERROR) 
 
 BASIC_ERROR = "Could not do basic authentication. Wrong username or password."
