@@ -18,7 +18,7 @@ import zipfile
 import json
 import shutil
 import os
-from schul_cloud_ressources_api_v1.configuration import Configuration
+import schul_cloud_ressources_api_v1.auth as auth
 from schul_cloud_ressources_api_v1.rest import ApiException
 from schul_cloud_ressources_api_v1 import ApiClient, RessourceApi
 from schul_cloud_ressources_api_v1.schema import get_valid_examples, get_invalid_examples
@@ -40,6 +40,15 @@ def valid_ressources():
 def invalid_ressources():
     """Return a list of invalid ressoruces useable by tests."""
     return get_invalid_examples()
+
+
+@pytest.fixture
+def a_valid_ressource(valid_ressources):
+    """Return a valid ressource.
+
+    This fixture is not parametrized and does not mulitply the tests.
+    """
+    return valid_ressources[0]
 
 
 # https://docs.pytest.org/en/latest/fixture.html#parametrizing-fixtures
@@ -73,43 +82,116 @@ def pytest_addoption(parser):
     parser.addoption("--apikey", action="append", default=[],
         help="apikey: list of api key authentications to use")
 
+ERROR_BASIC = "user name and password must be divided by \":\" when "\
+              "using --basic=username:password as a test parameter"
+
+def get_credentials(metafunc):
+    """Generate a list of credentials from the test parameters.
+
+    Return a tuple (authentication mechanism, user name, password)
+    """
+    users = []
+    if metafunc.config.option.noauth == "true":
+        users.append(("noauth", None, None))
+    for credentials in metafunc.config.option.basic:
+        assert ":" in credentials, ERROR_BASIC
+        username, password = credentials.split(":", 1)
+        users.append(("basic", username, password))
+    for credentials in metafunc.config.option.apikey:
+        credentials = credentials.split(":", 1)
+        username = (["anonymous api key"] if len(credentials) == 1 else credentials[0])
+        users.append(("apikey", username, credentials[-1]))
+    return users
+
+
 def pytest_generate_tests(metafunc):
     """Generate parameters.
 
     - _auth a list of authentication mechanisms
     """
-    if '_auth' in metafunc.fixturenames:
-        auth = ([None] if metafunc.config.option.noauth == "true" else []) + \
-               [("basic", a) for a in metafunc.config.option.basic] + \
-               [("apikey", k) for k in metafunc.config.option.apikey]
-        metafunc.parametrize("_auth", auth)
+    if "all_credentials"  in metafunc.fixturenames:
+        metafunc.parametrize("all_credentials", [get_credentials(metafunc)])
+    if "_user2" in metafunc.fixturenames and \
+       "_user1_auth2" in metafunc.fixturenames:
+       raise NotImplementedError()
+    elif "_user1" in metafunc.fixturenames and \
+       "_user2" in metafunc.fixturenames:
+       credentials = get_credentials(metafunc)
+       params = [(u1, u2) for u1 in credentials for u2 in credentials
+                 if u1[1] != u2[1]]
+       metafunc.parametrize("_user1,_user2", params)
+    elif "_user1" in metafunc.fixturenames and \
+       "_user1_auth2" in metafunc.fixturenames:
+       credentials = get_credentials(metafunc)
+       params = [(u1, u2) for u1 in credentials for u2 in credentials
+                 if u1[1] == u2[1] and u1[2] != u2[2]]
+       metafunc.parametrize("_user1,_user1_auth2", params)
+    elif "_user1" in metafunc.fixturenames:
+        credentials = get_credentials(metafunc)
+        metafunc.parametrize("_user1", credentials)
 
+class User(object):
+    """The user object for the tests.
 
-def _authenticate(auth):
-    """Return a generator for setting the configuration."""
-    configuration = Configuration()
-    if auth is None:
-        yield None
-    elif auth[0] == "basic":
-        configuration.username, configuration.password = auth[1].split(":", 1)
-        yield ["basic"]
-        configuration.username = configuration.password = ""
-    elif auth[0] == "apikey":
-        split = auth[1].split(":", 1)
-        configuration.api_key["api_key"] = split[0]
-        if len(split) == 2:
-            configuration.api_key_prefix["api_key"] = split[1]
-        yield ["api_key"]
-        configuration.api_key.pop("api_key")
-        configuration.api_key.pop("api_key")
-    else:
-        raise ValueError(auth)
+    The user has an api which uses a certain authentication.
+    """
+
+    def __init__(self, api, auth_type, name, secret):
+        """Create a new user object."""
+        self._api = api
+        assert auth_type in ["noauth", "basic", "apikey"]
+        self._auth_type = auth_type
+        self._name = name
+        self._secret = secret
+    
+    @property
+    def name(self):
+        """The user name, None if no name is given."""
+        return self._name
+
+    @property
+    def credentials(self):
+        """The authentication credentials, None if none are given."""
+        return self._name, self._secret
+
+    def authenticate(self):
+        """Authenticate the user."""
+        if self._auth_type == "noauth":
+            auth.none()
+        elif self._auth_type == "basic":
+            auth.basic(self._name, self._secret)
+        elif self._auth_type == "apikey":
+            auth.api_key(self._secret)
+        else:
+            raise ValueError(self._auth_type)
+
+    @property
+    def api(self):
+        """Return an api object that is authenticated."""
+        self.authenticate()
+        return self._api
+
+    def __repr__(self):
+        """A string representation."""
+        return "User(api, {}, {}, {})".format(self._auth_type, self._name, self._secret)
 
 
 @pytest.fixture
-def auth_settings(_auth):
-    """Authenticate the request."""
-    return _authenticate(_auth)
+def user1(_user1, _api):
+    """Return a user for the api with credentials."""
+    return User(_api, *_user1)
+
+
+@pytest.fixture
+def user1_auth2(_user1_auth2, _api):
+    """Return a user for the api with credentials."""
+    return User(_api, *_user1_auth2)
+
+
+@pytest.fixture
+def user2(_user2, _api):
+    """Return a user for the api with credentials."""
+    return User(_api, *_user2)
 
 
 @pytest.fixture
@@ -125,10 +207,15 @@ def client(url):
 
 
 @pytest.fixture
-def api(client):
+def _api(client):
     """The api to use to test the server."""
     return RessourceApi(client)
 
+
+@pytest.fixture
+def api(user1):
+    """The api uses the authentication credentials."""
+    return user1.api
 
 
 def step(function):
