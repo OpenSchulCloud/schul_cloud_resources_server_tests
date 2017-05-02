@@ -138,8 +138,17 @@ It is assumed, that adding ``invalid`` to the password,
 user name and api key will make it invalid.
 Tests use the invalid credentials to test the server behavior in rejected cases.
 
+Example Travis Configuration
+----------------------------
 
-
+If you want to implement a crawler or server, you can use Travis-CI to test
+it.
+An example travis configuration can be found in the `test-example
+<https://github.com/schul-cloud/schul_cloud_ressources_server_tests/blob/test-example/.travis.yml>`__ branch.
+You can view the `output
+<https://travis-ci.org/schul-cloud/schul_cloud_ressources_server_tests/branches>`__
+The configuration is generic.
+It will run under any other language you configure.
 
 TODO
 ----
