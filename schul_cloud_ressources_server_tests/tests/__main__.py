@@ -5,4 +5,5 @@ HERE = os.path.dirname(__file__)
 
 if __name__ == "__main__":
     import pytest
-    pytest.main([HERE] + sys.argv[1:])
+    errcode = pytest.main([HERE] + sys.argv[1:])
+    sys.exit(errcode)
