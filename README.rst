@@ -58,7 +58,7 @@ If you test the running server, make sure to authenticate in a way that does not
 
 .. code:: shell
 
-    pytest --pyargs schul_cloud_ressources_server_tests.test --url=http://localhost:8080/v1/
+    python -m schul_cloud_ressources_server_tests.tests --url=http://localhost:8080/v1/
 
 `http://localhost:8080/v1/` is the default url.
 
@@ -70,9 +70,9 @@ one test after the other.
 
 .. code:: shell
 
-    pytest --pyargs schul_cloud_ressources_server_tests.test -m step1
-    pytest --pyargs schul_cloud_ressources_server_tests.test -m step2
-    pytest --pyargs schul_cloud_ressources_server_tests.test -m step3
+    python -m schul_cloud_ressources_server_tests.tests -m step1
+    python -m schul_cloud_ressources_server_tests.tests -m step2
+    python -m schul_cloud_ressources_server_tests.tests -m step3
     ...
 
 - `step1` runs the first test  
@@ -84,7 +84,7 @@ You can run  a single test with
 
 .. code:: shell
 
-    pytest --pyargs schul_cloud_ressources_server_tests.test -m step3only
+    python -m schul_cloud_ressources_server_tests.tests -m step3only
 
 Test Authentication
 ~~~~~~~~~~~~~~~~~~~
@@ -95,8 +95,8 @@ Thus, an example test call to your api could look like this:
 
 .. code:: Python
 
-    pytest --pyargs schul_cloud_ressources_server_tests.test \
-           --url=http://url.to/your/server \
+    python -m schul_cloud_ressources_server_tests.tests  \
+           --url=http://url.to/your/server               \
            --noauth=false --basic=username:password
 
 If you have an api key, you can test that the server works.
@@ -104,8 +104,8 @@ Do not forget the ``:`` before the api key.
 
 .. code:: Python
 
-    pytest --pyargs schul_cloud_ressources_server_tests.test \
-           --url=http://url.to/your/server \
+    python -m schul_cloud_ressources_server_tests.tests   \
+           --url=http://url.to/your/server                \
            --noauth=false --apikey=:apikey
 
 By default the test server accepts authentication with several credentials
@@ -125,10 +125,10 @@ If the api only accepts authenticated requests, set ``--noauth=false``.
 
 .. code:: Python
 
-    pytest --pyargs schul_cloud_ressources_server_tests.test \
-           --basic=valid1@schul-cloud.org:123abc \
-           --basic=valid2@schul-cloud.org:supersecure \
-           --apikey=valid1@schul-cloud.org:abcdefghijklmn \
+    python -m schul_cloud_ressources_server_tests.tests    \
+           --basic=valid1@schul-cloud.org:123abc           \
+           --basic=valid2@schul-cloud.org:supersecure      \
+           --apikey=valid1@schul-cloud.org:abcdefghijklmn  \
            --noauth=true
 
 All tests are run with the different authentication options.
