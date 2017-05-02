@@ -47,6 +47,9 @@ def get_ressources():
     If authentication failed, this aborts the execution with
     401 Unauthorized.
     """
+    header = request.environ.get('HTTP_AUTHORIZATION','')
+    if header:
+        print("Authorization:", header)
     basic = request.auth
     if basic:
         username, password = basic
