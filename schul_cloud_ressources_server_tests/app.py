@@ -93,7 +93,7 @@ def get_ressource(_id):
 def delete_ressource(_id):
     """Delete a saved ressource."""
     ressources = get_ressources()
-    del ressources[_id]
+    ressources.pop(_id)
 
 
 def get_ressource_ids():
