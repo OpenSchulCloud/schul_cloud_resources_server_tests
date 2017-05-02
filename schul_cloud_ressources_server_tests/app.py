@@ -25,13 +25,18 @@ api_keys = {
    "abcdefghijklmn": "valid1@schul-cloud.org"
 }
 
+HEADER_ERROR = "Malfomred Authorization header."
+
 def get_api_key():
     """Return the api key or None."""
     header = request.headers.get('Authorization')
     if not header: return
-    method, data = header.split(None, 1)
-    if method.lower() != 'api-key': return
-    return touni(base64.b64decode(tob(data[4:])))
+    try:
+        method, data = header.split(None, 1)
+        if method.lower() != 'api-key': return
+        return touni(base64.b64decode(tob(data[4:])))
+    except ValueError:
+        abort(401, HEADER_ERROR) 
 
 BASIC_ERROR = "Could not do basic authentication. Wrong username or password."
 API_KEY_ERROR = "Could not authenticate using the given api key."
