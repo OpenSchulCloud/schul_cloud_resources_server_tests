@@ -1,3 +1,10 @@
-bottle==0.12.13
-jsonschema==2.6.0
-schul-cloud-ressources-api-v1
+bottle==0.12.13                # app
+jsonschema==2.6.0              # via schul-cloud-ressources-api-v1
+schul-cloud-ressources-api-v1  # app + tests
+requests==2.13.0               # tests
+pytest==3.0.7                  # tests
+six==1.10.0                    # via pytest
+appdirs==1.4.3                 # via pytest
+packaging==16.8                # via pytest
+pyparsing==2.2.0               # via pytest
+
