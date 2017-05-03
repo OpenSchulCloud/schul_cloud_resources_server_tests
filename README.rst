@@ -14,6 +14,8 @@ This repository contains
 - a server to test scrapers against
 - tests to test the server
 
+The package works under Python 2 and 3.
+
 Installation
 ------------
 
@@ -45,7 +47,7 @@ To start the server, run
 
 .. code:: shell
 
-    python3 -m schul_cloud_ressources_server_tests.app
+    python -m schul_cloud_ressources_server_tests.app
 
 The server should appear at http://localhost:8080/v1.
 
