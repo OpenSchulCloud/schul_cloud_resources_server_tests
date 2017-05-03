@@ -60,7 +60,7 @@ If you test the running server, make sure to authenticate in a way that does not
 
     python -m schul_cloud_ressources_server_tests.tests --url=http://localhost:8080/v1/
 
-`http://localhost:8080/v1/` is the default url.
+http://localhost:8080/v1/ is the default url.
 
 Steps for Implementation
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -90,23 +90,23 @@ Test Authentication
 ~~~~~~~~~~~~~~~~~~~
 
 The test server supports api key authentication and basic authentication.
-If you test authentication over the internet, using https protects the secrets.
+If you test authentication over the internet.
+Use https to protect the secrets.
 Thus, an example test call to your api could look like this:
 
 .. code:: Python
 
     python -m schul_cloud_ressources_server_tests.tests  \
-           --url=http://url.to/your/server               \
+           --url=https://url.to/your/server               \
            --noauth=false --basic=username:password
 
 If you have an api key, you can test that the server works.
-Do not forget the ``:`` before the api key.
 
 .. code:: Python
 
     python -m schul_cloud_ressources_server_tests.tests   \
            --url=http://url.to/your/server                \
-           --noauth=false --apikey=:apikey
+           --noauth=false --apikey=apikey
 
 By default the test server accepts authentication with several credentials
 
@@ -132,7 +132,7 @@ If the api only accepts authenticated requests, set ``--noauth=false``.
            --noauth=true
 
 All tests are run with the different authentication options.
-If we have several ways to authenticate, test if the user sees the other posts.
+If we have several ways to authenticate, the tests test if the user sees the other users' data.
 
 It is assumed, that adding ``invalid`` to the password,
 user name and api key will make it invalid.
