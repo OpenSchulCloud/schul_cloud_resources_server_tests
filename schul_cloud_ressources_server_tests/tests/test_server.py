@@ -261,10 +261,10 @@ class TestAuthentication:
 
     @step
     @pytest.mark.parametrize("action", [
- #           lambda api, res: api.add_ressource(res),
- #           lambda api, res: api.get_ressource_ids(),
- #           lambda api, res: api.delete_ressource("64682437"),
- #           lambda api, res: api.get_ressource("tralala"),
+            lambda api, res: api.add_ressource(res),
+            lambda api, res: api.get_ressource_ids(),
+            lambda api, res: api.delete_ressource("64682437"),
+            lambda api, res: api.get_ressource("tralala"),
             lambda api, res: api.delete_ressources()
         ])
     def test_invalid_user_can_not_access_the_api(
@@ -284,4 +284,3 @@ class TestAuthentication:
         result = requests.get(url + "/ressources/ids",
                               headers={"Authorization": header})
         assert result.status_code == 401
-    
