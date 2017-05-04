@@ -152,6 +152,29 @@ You can view the `output
 The configuration is generic.
 It will run under any other language you configure.
 
+Use the server in pytest
+------------------------
+
+You can use the sever in Python tests.
+There are fixtures available that start and stop the server.
+
+.. code:: Python
+
+    from schul_cloud_ressources_server_tests.tests.fixtures import *
+
+    def test_pytest(ressources_server):
+        """pytest using the server"""
+
+The following attributes are available:
+
+- ``ressources_server.url`` The url of the server.
+- ``ressources_server.api`` A ``schul_cloud_ressources_api_v1.RessourcesApi`` object connected to the server.
+- ``ressources_server.get_ressources()`` A function to return a list of ressources on the server.
+
+For more information, see the module ``schul_cloud_ressources_server_tests.tests.fixtures``.
+You can add support for more test frameworks.
+
+
 TODO
 ----
 
