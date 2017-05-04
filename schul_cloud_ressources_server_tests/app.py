@@ -4,18 +4,45 @@ import json
 import jsonschema
 import base64
 from schul_cloud_ressources_api_v1.schema import validate_ressource, ValidationFailed
-from bottle import run, post, request, get, delete, abort, response, tob, touni
+from bottle import request, abort, response, tob, touni, Bottle
+
+app = Bottle()
+
+run = app.run
+post = app.post
+get = app.get
+delete = app.delete
 
 # configuration constants
 BASE = "/v1"
 
 # global variables
-_ressources = {
-    "valid1@schul-cloud.org": {},
-    "valid2@schul-cloud.org": {},
-    None: {}
-} # user: id: ressource
 last_id = 0
+
+
+class data(object):
+    """The data interface the server operates with."""
+
+    @staticmethod
+    def delete_ressources():
+        """Initialize the ressources."""
+        global _ressources
+        _ressources = {
+            "valid1@schul-cloud.org": {},
+            "valid2@schul-cloud.org": {},
+            None: {}
+        } # user: id: ressource
+
+    @staticmethod
+    def get_ressources():
+        """Return all stored ressources."""
+        ressources = []
+        for user_ressources in _ressources.values():
+            ressources.extend(user_ressources.values())
+        return ressources
+
+
+data.delete_ressources()
 
 passwords = {
     "valid1@schul-cloud.org": "123abc",
@@ -123,7 +150,9 @@ def delete_ressources():
     ressources = get_ressources()
     ressources.clear()
 
+
 def main():
+    """Start the serer from the command line."""
     port = (int(sys.argv[1]) if len(sys.argv) >= 2 else 8080)
     run(host="", port=port, debug=True, reloader=True)
 

@@ -1,9 +1,9 @@
 import os
 import sys
+import pytest
 
 HERE = os.path.dirname(__file__)
+API_TESTS = os.path.join(HERE, "test_api.py")
 
-if __name__ == "__main__":
-    import pytest
-    errcode = pytest.main([HERE] + sys.argv[1:])
-    sys.exit(errcode)
+errcode = pytest.main([API_TESTS] + sys.argv[1:])
+sys.exit(errcode)

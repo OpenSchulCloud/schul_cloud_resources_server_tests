@@ -22,6 +22,7 @@ import schul_cloud_ressources_api_v1.auth as auth
 from schul_cloud_ressources_api_v1.rest import ApiException
 from schul_cloud_ressources_api_v1 import ApiClient, RessourceApi
 from schul_cloud_ressources_api_v1.schema import get_valid_examples, get_invalid_examples
+from schul_cloud_ressources_server_tests.tests.fixtures import *
 
 
 NUMBER_OF_VALID_RESSOURCES = 3
