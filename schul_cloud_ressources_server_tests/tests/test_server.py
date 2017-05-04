@@ -1,4 +1,5 @@
 import requests
+from pytest import raises
 
 
 def test_server_is_there(ressources_server):
@@ -15,5 +16,7 @@ def test_server_works_on_data(ressources_server, valid_ressource):
 # this must be the last test
 def test_server_stops(ressources_server):
     """Test that the server stops in the end."""
-    requests.get(ressources_server.url)
+    ressources_server.shutdown()
+    with raises(requests.exceptions.ReadTimeout):
+        requests.get(ressources_server.url,timeout=0.01)
     
