@@ -9,7 +9,7 @@ import sys
 import os
 from setuptools import setup, find_packages
 
-NAME = "schul_cloud_ressources_server_tests"
+NAME = "schul_cloud_resources_server_tests"
 VERSION = "1.0"
 if os.environ.get("TRAVIS_BUILD_NUMBER"):
     # same as in ../generate_python_client.sh

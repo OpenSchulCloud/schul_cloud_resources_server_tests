@@ -1,8 +1,8 @@
 import pytest
 import time
-import schul_cloud_ressources_api_v1.auth as auth
-from schul_cloud_ressources_server_tests.app import data, app
-from schul_cloud_ressources_api_v1 import ApiClient, RessourceApi
+import schul_cloud_resources_api_v1.auth as auth
+from schul_cloud_resources_server_tests.app import data, app
+from schul_cloud_resources_api_v1 import ApiClient, ResourceApi
 from bottle import ServerAdapter
 from threading import Thread
 
@@ -72,46 +72,46 @@ class ParallelBottleServer(object):
 
 
 
-class RessourcesApiTestServer(ParallelBottleServer):
+class ResourcesApiTestServer(ParallelBottleServer):
     """Interface to get the objects."""
 
     url_prefix = "/v1"
 
     def __init__(self):
-        """Create a new server serving the ressources api."""
+        """Create a new server serving the resources api."""
         ParallelBottleServer.__init__(self, app)
 
-    def get_ressources(self):
-        """Return all currently saved ressources."""
-        return data.get_ressources()
+    def get_resources(self):
+        """Return all currently saved resources."""
+        return data.get_resources()
 
-    def delete_ressources(self):
-        """Clean up all ressources."""
-        data.delete_ressources()
+    def delete_resources(self):
+        """Clean up all resources."""
+        data.delete_resources()
 
     @property
     def api(self):
-        """An ressources api client connected to the server."""
+        """An resources api client connected to the server."""
         auth.none()
         client = ApiClient(self.url)
-        return RessourceApi(client)
+        return ResourceApi(client)
 
 
 @pytest.fixture(scope="session")
-def session_ressources_server():
-    """Return the server to store ressources."""
-    session_ressources_server = RessourcesApiTestServer()
-    yield session_ressources_server
-    session_ressources_server.shutdown()
+def session_resources_server():
+    """Return the server to store resources."""
+    session_resources_server = ResourcesApiTestServer()
+    yield session_resources_server
+    session_resources_server.shutdown()
 
 
 @pytest.fixture
-def ressources_server(session_ressources_server):
-    """Return a fresh server object with no ressources."""
-    session_ressources_server.delete_ressources()
-    yield session_ressources_server
-    session_ressources_server.delete_ressources()
+def resources_server(session_resources_server):
+    """Return a fresh server object with no resources."""
+    session_resources_server.delete_resources()
+    yield session_resources_server
+    session_resources_server.delete_resources()
 
 
-__all__  = ["StoppableWSGIRefServerAdapter", "ParallelBottleServer", "RessourcesApiTestServer",
-            "session_ressources_server", "ressources_server"]
+__all__  = ["StoppableWSGIRefServerAdapter", "ParallelBottleServer", "ResourcesApiTestServer",
+            "session_resources_server", "resources_server"]

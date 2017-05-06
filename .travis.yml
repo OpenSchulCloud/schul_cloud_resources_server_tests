@@ -13,7 +13,7 @@ env:
 
 install:
 - pip install -r requirements.txt
-- python -m schul_cloud_ressources_server_tests.app &
+- python -m schul_cloud_resources_server_tests.app &
 - sleep 3
 - pip install twine wheel
 
@@ -34,6 +34,6 @@ deploy:
   on:
     branch: master
     condition: "\"$TRAVIS_PYTHON_VERSION\" == \"3.5\""
-  repo: schul-cloud/schul_cloud_ressources_server_tests
+  repo: schul-cloud/schul_cloud_resources_server_tests
   skip_cleanup: true
 

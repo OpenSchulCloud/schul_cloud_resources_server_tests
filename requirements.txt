@@ -1,6 +1,6 @@
 bottle==0.12.13                # app
-jsonschema==2.6.0              # via schul-cloud-ressources-api-v1
-schul-cloud-ressources-api-v1  # app + tests
+jsonschema==2.6.0              # via schul-cloud-resources-api-v1
+schul-cloud-resources-api-v1   # app + tests
 requests==2.13.0               # tests
 pytest==3.0.7                  # tests
 six==1.10.0                    # via pytest

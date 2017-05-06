@@ -1,12 +1,12 @@
-Schul-Cloud Ressources Server Tests
-===================================
+Schul-Cloud Resources Server Tests
+==================================
 
-.. image:: https://travis-ci.org/schul-cloud/schul_cloud_ressources_server_tests.svg?branch=master
-   :target: https://travis-ci.org/schul-cloud/schul_cloud_ressources_server_tests
+.. image:: https://travis-ci.org/schul-cloud/schul_cloud_resources_server_tests.svg?branch=master
+   :target: https://travis-ci.org/schul-cloud/schul_cloud_resources_server_tests
    :alt: Build Status
 
-.. image:: https://badge.fury.io/py/schul-cloud-ressources-server-tests.svg
-   :target: https://pypi.python.org/pypi/schul-cloud-ressources-server-tests
+.. image:: https://badge.fury.io/py/schul-cloud-resources-server-tests.svg
+   :target: https://pypi.python.org/pypi/schul-cloud-resources-server-tests
    :alt: Python Package Index
 
 This repository contains
@@ -23,13 +23,13 @@ Using `pip`, you can install all dependencies like this:
 
 .. code:: shell
 
-    pip install schul_cloud_ressources_server_tests
+    pip install schul_cloud_resources_server_tests
 
 When you are done, you can import the package.
 
 .. code:: Python
 
-    import schul_cloud_ressources_server_tests
+    import schul_cloud_resources_server_tests
 
 Usage
 -----
@@ -47,7 +47,7 @@ To start the server, run
 
 .. code:: shell
 
-    python -m schul_cloud_ressources_server_tests.app
+    python -m schul_cloud_resources_server_tests.app
 
 The server should appear at http://localhost:8080/v1.
 
@@ -60,7 +60,7 @@ If you test the running server, make sure to authenticate in a way that does not
 
 .. code:: shell
 
-    python -m schul_cloud_ressources_server_tests.tests --url=http://localhost:8080/v1/
+    python -m schul_cloud_resources_server_tests.tests --url=http://localhost:8080/v1/
 
 http://localhost:8080/v1/ is the default url.
 
@@ -72,9 +72,9 @@ one test after the other.
 
 .. code:: shell
 
-    python -m schul_cloud_ressources_server_tests.tests -m step1
-    python -m schul_cloud_ressources_server_tests.tests -m step2
-    python -m schul_cloud_ressources_server_tests.tests -m step3
+    python -m schul_cloud_resources_server_tests.tests -m step1
+    python -m schul_cloud_resources_server_tests.tests -m step2
+    python -m schul_cloud_resources_server_tests.tests -m step3
     ...
 
 - `step1` runs the first test  
@@ -86,7 +86,7 @@ You can run  a single test with
 
 .. code:: shell
 
-    python -m schul_cloud_ressources_server_tests.tests -m step3only
+    python -m schul_cloud_resources_server_tests.tests -m step3only
 
 Test Authentication
 ~~~~~~~~~~~~~~~~~~~
@@ -98,7 +98,7 @@ Thus, an example test call to your api could look like this:
 
 .. code:: Python
 
-    python -m schul_cloud_ressources_server_tests.tests  \
+    python -m schul_cloud_resources_server_tests.tests  \
            --url=https://url.to/your/server               \
            --noauth=false --basic=username:password
 
@@ -106,7 +106,7 @@ If you have an api key, you can test that the server works.
 
 .. code:: Python
 
-    python -m schul_cloud_ressources_server_tests.tests   \
+    python -m schul_cloud_resources_server_tests.tests   \
            --url=http://url.to/your/server                \
            --noauth=false --apikey=apikey
 
@@ -127,7 +127,7 @@ If the api only accepts authenticated requests, set ``--noauth=false``.
 
 .. code:: Python
 
-    python -m schul_cloud_ressources_server_tests.tests    \
+    python -m schul_cloud_resources_server_tests.tests    \
            --basic=valid1@schul-cloud.org:123abc           \
            --basic=valid2@schul-cloud.org:supersecure      \
            --apikey=valid1@schul-cloud.org:abcdefghijklmn  \
@@ -146,9 +146,9 @@ Example Travis Configuration
 If you want to implement a crawler or server, you can use Travis-CI to test
 it.
 An example travis configuration can be found in the `test-example
-<https://github.com/schul-cloud/schul_cloud_ressources_server_tests/blob/test-example/.travis.yml>`__ branch.
+<https://github.com/schul-cloud/schul_cloud_resources_server_tests/blob/test-example/.travis.yml>`__ branch.
 You can view the `output
-<https://travis-ci.org/schul-cloud/schul_cloud_ressources_server_tests/branches>`__
+<https://travis-ci.org/schul-cloud/schul_cloud_resources_server_tests/branches>`__
 The configuration is generic.
 It will run under any other language you configure.
 
@@ -160,18 +160,18 @@ There are fixtures available that start and stop the server.
 
 .. code:: Python
 
-    from schul_cloud_ressources_server_tests.tests.fixtures import *
+    from schul_cloud_resources_server_tests.tests.fixtures import *
 
-    def test_pytest(ressources_server):
+    def test_pytest(resources_server):
         """pytest using the server"""
 
 The following attributes are available:
 
-- ``ressources_server.url`` The url of the server.
-- ``ressources_server.api`` A ``schul_cloud_ressources_api_v1.RessourcesApi`` object connected to the server.
-- ``ressources_server.get_ressources()`` A function to return a list of ressources on the server.
+- ``resources_server.url`` The url of the server.
+- ``resources_server.api`` A ``schul_cloud_resources_api_v1.ResourcesApi`` object connected to the server.
+- ``resources_server.get_resources()`` A function to return a list of resources on the server.
 
-For more information, see the module ``schul_cloud_ressources_server_tests.tests.fixtures``.
+For more information, see the module ``schul_cloud_resources_server_tests.tests.fixtures``.
 You can add support for more test frameworks.
 
 
@@ -189,4 +189,4 @@ TODO
 
 
 
-.. _API: https://github.com/schul-cloud/ressources-api-v1
+.. _API: https://github.com/schul-cloud/resources-api-v1

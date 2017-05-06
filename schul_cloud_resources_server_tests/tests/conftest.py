@@ -18,51 +18,51 @@ import zipfile
 import json
 import shutil
 import os
-import schul_cloud_ressources_api_v1.auth as auth
-from schul_cloud_ressources_api_v1.rest import ApiException
-from schul_cloud_ressources_api_v1 import ApiClient, RessourceApi
-from schul_cloud_ressources_api_v1.schema import get_valid_examples, get_invalid_examples
-from schul_cloud_ressources_server_tests.tests.fixtures import *
+import schul_cloud_resources_api_v1.auth as auth
+from schul_cloud_resources_api_v1.rest import ApiException
+from schul_cloud_resources_api_v1 import ApiClient, ResourceApi
+from schul_cloud_resources_api_v1.schema import get_valid_examples, get_invalid_examples
+from schul_cloud_resources_server_tests.tests.fixtures import *
 
 
 NUMBER_OF_VALID_RESSOURCES = 3
 NUMBER_OF_INVALID_RESSOURCES = 2
-RESSOURCES_API_ZIP_URL = "https://github.com/schul-cloud/ressources-api-v1/archive/master.zip"
-RESSOURCES_EXAMPLES_BASE_PATH = "ressources-api-v1-master/schemas/ressource/examples"
+RESSOURCES_API_ZIP_URL = "https://github.com/schul-cloud/resources-api-v1/archive/master.zip"
+RESSOURCES_EXAMPLES_BASE_PATH = "resources-api-v1-master/schemas/resource/examples"
 
 
 @pytest.fixture
-def valid_ressources():
+def valid_resources():
     """Return a list of valid ressoruces useable by tests."""
     return get_valid_examples()
 
 
 @pytest.fixture
-def invalid_ressources():
+def invalid_resources():
     """Return a list of invalid ressoruces useable by tests."""
     return get_invalid_examples()
 
 
 @pytest.fixture
-def a_valid_ressource(valid_ressources):
-    """Return a valid ressource.
+def a_valid_resource(valid_resources):
+    """Return a valid resource.
 
     This fixture is not parametrized and does not mulitply the tests.
     """
-    return valid_ressources[0]
+    return valid_resources[0]
 
 
 # https://docs.pytest.org/en/latest/fixture.html#parametrizing-fixtures
 @pytest.fixture(params=list(range(NUMBER_OF_VALID_RESSOURCES)))
-def valid_ressource(request, valid_ressources):
-    """Return a valid ressource."""
-    return valid_ressources[request.param % len(valid_ressources)]
+def valid_resource(request, valid_resources):
+    """Return a valid resource."""
+    return valid_resources[request.param % len(valid_resources)]
 
 
 @pytest.fixture(params=list(range(NUMBER_OF_INVALID_RESSOURCES)))
-def invalid_ressource(request, invalid_ressources):
-    """Return an invalid ressource."""
-    return invalid_ressources[request.param % len(invalid_ressources)]
+def invalid_resource(request, invalid_resources):
+    """Return an invalid resource."""
+    return invalid_resources[request.param % len(invalid_resources)]
 
 
 def pytest_addoption(parser):
@@ -247,7 +247,7 @@ def client(url):
 @pytest.fixture
 def _api(client):
     """The api to use to test the server."""
-    return RessourceApi(client)
+    return ResourceApi(client)
 
 
 @pytest.fixture
@@ -270,5 +270,31 @@ def step(function):
     _steps.append(mark_function)
     return marker_only(marker(function))
 _steps = []
-
 __builtins__["step"] = step
+
+
+# json api fixtures
+
+_example_json = json.dumps(get_valid_examples()[0])
+
+@pytest.fixture(params=[
+        lambda url, headers: requests.get(url + "/resources/ids",
+                                          headers=headers, data=_example_json),
+        lambda url, headers: requests.delete(url + "/resources",
+                                             headers=headers, data=_example_json),
+    ])
+def request_with_headers(request, url):
+    """Return a function to pass the headers to.
+
+    This function sends http requests to the server.
+    The requests.response object is returned.
+    """
+    get_request = request.param
+    def request_with_headers(headers):
+        """Set the headers of the request and send it to the server."""
+        return get_request(url, headers)
+    return request_with_headers
+
+
+
+
