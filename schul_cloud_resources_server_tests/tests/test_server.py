@@ -4,7 +4,7 @@ from pytest import raises
 
 def test_server_is_there(resources_server):
     """Test that the server is there."""
-    requests.get(resources_server.url)
+    requests.get(resources_server.url, headers={"Content-Type":"application/vnd.api+json"})
 
 
 def test_server_works_on_data(resources_server, valid_resource):

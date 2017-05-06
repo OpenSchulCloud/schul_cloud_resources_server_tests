@@ -349,6 +349,7 @@ class TestJsonApi:
         - error case
         - added media type parameters are errors 415 Unsupported Media Type
         - 406 Not Acceptable if client only sends application/vnd.api+json
+        - Accept header
     """
 
     class TestUnsupportedMediaType:

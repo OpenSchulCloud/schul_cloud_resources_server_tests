@@ -3,6 +3,7 @@ import sys
 import json
 import jsonschema
 import base64
+import traceback
 import os
 HERE = os.path.dirname(__file__)
 try:
@@ -44,6 +45,7 @@ def _error(error, code):
         "title": errors[code],
         "detail": error.body
     }
+    traceback.print_exception(type(error), error, error.traceback)
     return response_object(errors=[_error])
 
 for code in [404, 415]:
@@ -142,13 +144,11 @@ def add_resource():
     _id = str(last_id)
     last_id += 1
     try:
-        resource = request.json
-    except (ValueError, TypeError):
+        resource = json.loads(touni(request.body.read()))
+    except (TypeError, ValueError):
         # this can be removed with later releases of bottle
         # https://github.com/bottlepy/bottle/blob/41ed6965de9bf7d0060ffd8245bf65ceb616e26b/bottle.py#L1292
         abort(400, "The request body is not a valid JSON object.")
-    if resource is None:
-        abort(415, "JSON is expected.")
     try:
         validate_resource(resource)
     except ValidationFailed as error:
@@ -182,7 +182,7 @@ def get_resource_ids():
     """Return the list of current ids."""
     test_json_api_headers()
     resources = get_resources()
-    response.content_type = 'application/json'
+    response.content_type = 'application/vnd.api+json'
     return json.dumps(list(resources.keys()))
 
 
