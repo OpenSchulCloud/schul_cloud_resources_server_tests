@@ -1,5 +1,11 @@
 import json
 from schul_cloud_resources_server_tests.errors import errors as server_errors
+import sys
+
+if sys.version_info[0] == 2:
+    STRING_TYPE = unicode
+else:
+    STRING_TYPE = str
 
 
 def to_dict(model):
@@ -23,7 +29,7 @@ def assertIsResponse(response):
     assert jsonapi, "the jsonapi attribute must be set in the reponse"
     for attr in ["name", "source", "description"]:
         assert attr in jsonapi, "{} must be present, see #/definition/Jsonapi".format(attr)
-        assert isinstance(attr, str)
+        assert isinstance(attr, STRING_TYPE)
 
 
 def assertIsError(response, status):
@@ -43,8 +49,8 @@ def assertIsError(response, status):
         for attr in ["status", "title", "detail"]:
             assert attr in error, "#/definitions/ErrorElement"
         assert isinstance(error["status"], int), "#/definitions/ErrorElement"
-        assert isinstance(error["title"], str), "#/definitions/ErrorElement"
-        assert isinstance(error["detail"], str), "#/definitions/ErrorElement"
+        assert isinstance(error["title"], STRING_TYPE), "#/definitions/ErrorElement"
+        assert isinstance(error["detail"], STRING_TYPE), "#/definitions/ErrorElement"
     error = errors[0]
     assert error["status"] == status
     assert error["title"] == server_errors[status]
