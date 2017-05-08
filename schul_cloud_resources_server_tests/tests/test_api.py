@@ -1,5 +1,6 @@
 import requests
 from pytest import fixture, mark
+from schul_cloud_resources_server_tests.tests.assertions import *
 
 
 @step
@@ -77,7 +78,10 @@ class TestAddResource:
         assert location.startswith(host)
         assert response.headers["Location"] == response.json()["links"]["self"]
 
-
+    @step
+    def test_creation_is_response(self, add_resource_response):
+        """Make sure all required attributes are set."""
+        assertIsResponse(add_resource_response)
 
 
 

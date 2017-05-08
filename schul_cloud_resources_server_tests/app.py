@@ -63,6 +63,16 @@ def get_location_url(resource_id):
     """Return the location orl of a resource given by id."""
     return "http://" + request.headers["Host"] + BASE + "/resources/{}".format(resource_id)
 
+
+def response_object(cnf={}, **kw):
+    kw.update(cnf)
+    kw["jsonapi"] = dict(
+        name="schul_cloud_resources_server_tests.app",
+        source="https://gitub.com/schul-cloud/schul_cloud_resources_server_tests",
+        description="A test server to test crawlers agains the resources api.")
+    return json.dumps(kw)
+
+
 @post(BASE + "/resources")
 def add_resource():
     """Add a new resource."""
@@ -73,9 +83,8 @@ def add_resource():
     resource = resource = add_request["data"]
     link = get_location_url(1)
     response.headers["Location"] = link
-    return {"data": {"attributes": resource, "type":"resource"},
-            "links": {"self":link}}
-
+    return response_object({"data": {"attributes": resource, "type":"resource"},
+            "links": {"self":link}})
 
 @get(BASE + "/resources/<_id>")
 def get_resource(_id):
