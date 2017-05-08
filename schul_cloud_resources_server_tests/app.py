@@ -154,6 +154,7 @@ def delete_resources():
     """Delete all resources."""
     resources = get_resources()
     resources.clear()
+    response.status = 204
 
 
 def main():

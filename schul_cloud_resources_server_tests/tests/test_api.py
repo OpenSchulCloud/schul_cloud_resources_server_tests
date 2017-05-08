@@ -50,32 +50,32 @@ class TestAddResource:
 
     @step
     def test_self_link_links_to_resource(
-            self, add_resource_response, valid_resource, auth_get):
+            self, add_resource_response, valid_resource, user1):
         """Links are returned. The self link should point to the resource."""
-        response = auth_get(add_resource_response.links.self)
+        response = user1.get(add_resource_response.links.self)
         data = response.json()
         resource = data["data"]["attributes"]
         assert resource == valid_resource
 
     @step
-    def test_location_header_is_set(self, auth_post, valid_resource, url):
+    def test_location_header_is_set(self, user1, valid_resource, url):
         """Post a new resource and the the location header. wich should be teh self link.
 
         see http://jsonapi.org/format/#crud-creating
         """
-        response = auth_post(url + "/resources", json={"data":valid_resource})
+        response = user1.post(url + "/resources", json={"data":valid_resource})
         assert response.headers["Location"] == response.json()["links"]["self"]
 
     @step
     @mark.parametrize("host", ["google.de", "schul-cloud.org"])
-    def test_location_header_uses_host_header(self, auth_post, valid_resource, url, host):
+    def test_location_header_uses_host_header(self, user1, valid_resource, url, host):
         """Post a new resource and the the location header. Which should be the self link.
 
         see http://jsonapi.org/format/#crud-creating
         Additionally, use a different host header.
         """
         headers = ({"Host": host} if host else {})
-        response = auth_post(url + "/resources", headers=headers, json={"data":valid_resource})
+        response = user1.post(url + "/resources", headers=headers, json={"data":valid_resource})
         location = response.headers["Location"].split("//", 1)[1]
         assert location.startswith(host)
         assert response.headers["Location"] == response.json()["links"]["self"]
@@ -241,6 +241,8 @@ class TestDeleteAllResources:
             assert error.value.status == 404
             assertIsError(error.value.body, 404)
 
-
-    def test_deleting_all_resources_returns_204(self, api):
-        assert False
+    @step
+    def test_deleting_all_resources_returns_204(self, user1, url):
+        """The status code should be 204 on content"""
+        response = user1.delete(url + "/resources")
+        assert response.status_code == 204

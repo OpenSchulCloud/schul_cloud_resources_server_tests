@@ -215,21 +215,15 @@ class User(object):
         """Return a requests.get with authentication parameters."""
         return requests.post(url, **kw)
 
+    def delete(self, url, **kw):
+        """Return a requests.get with authentication parameters."""
+        return requests.delete(url, **kw)
+
 @pytest.fixture
 def user1(_user1, _api):
     """Return a user for the api with credentials."""
     return User(_api, *_user1)
 
-
-@pytest.fixture
-def auth_get(user1):
-    """Autheticated get request by requests."""
-    return user1.get
-
-@pytest.fixture
-def auth_post(user1):
-    """Autheticated post request by requests."""
-    return user1.post
 
 @pytest.fixture
 def user1_auth2(_user1_auth2, _api):
@@ -299,7 +293,7 @@ _example_json = json.dumps(get_valid_examples()[0])
                                           headers=headers, data=_example_json),
         lambda url, headers: requests.delete(url + "/resources",
                                              headers=headers, data=_example_json),
-    ])
+    ]) # TODO: add delete, post, ... all endpoints
 def request_with_headers(request, url):
     """Return a function to pass the headers to.
 
