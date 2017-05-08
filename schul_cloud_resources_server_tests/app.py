@@ -125,10 +125,13 @@ def add_resource():
 @get(BASE + "/resources/<_id>")
 def get_resource(_id):
     """Get a resource identified by id."""
+    if _id == "ids":
+        return get_resource_ids()
     resource = resources.get(_id)
     if resource is None:
         abort(404, "The resource with the id \"{}\" coul not be found.".format({_id}))
     return response_object({"data": {"attributes": resource, "id": _id, "type": "resource"}, })
+
 
 @delete(BASE + "/resources/<_id>")
 def delete_resource(_id):
@@ -136,6 +139,13 @@ def delete_resource(_id):
     resources = get_resources()
     if resources.pop(_id, None) is None:
         abort(404, "Resource {} not found.".format(_id))
+
+
+def get_resource_ids():
+    """Return the list of current ids."""
+    resources = get_resources()
+    #response.content_type = 'application/vnd.api+json'
+    return {"data": [{"type": "id", "id": _id} for _id in resources]}
 
 
 def main():

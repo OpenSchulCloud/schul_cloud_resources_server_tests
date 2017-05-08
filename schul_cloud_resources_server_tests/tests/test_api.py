@@ -176,3 +176,49 @@ class TestDeleteResource:
         assertIsError(get_error.value.body, 404)
 
 
+class TestListResources:
+    """Test the listing of resources."""
+
+    @fixture
+    def list_response(self, api):
+        """Return a response for listing resources."""
+        return api.get_resource_ids()
+
+    @step
+    def test_list_of_resource_ids_is_a_list(self, list_response):
+        """The list returned by the api should be a list if strings."""
+        assert isinstance(list_response.data, list)
+
+    @step
+    def test_all_ids_are_ids(self, list_response):
+        """The listed ids are all ids."""
+        assert all(_id["type"] == "id" for _id in list_response.data)
+
+    @step
+    def test_all_ids_are_unique(self, list_response):
+        """The ids are only once in the list."""
+        ids = set(_id["id"] for _id in list_response.data)
+        assert len(ids) == len(list_response.data)
+
+    @step
+    def test_valid_jsonapi_response(self, list_response):
+        """The response shoule be a json api response."""
+        assertIsResponse(list_response)
+
+    @step
+    def test_new_resources_are_listed(api, valid_resource):
+        """Posting new resources adds them their ids to the list of ids."""
+        ids_before = set(_id["id"] for _id in api.get_resource_ids().data)
+        r1 = api.add_resource(valid_resource)
+        ids_after = set(_id["id"] for _id in api.get_resource_ids().data)
+        new_ids = ids_after - ids_before
+        assert r1.id in new_ids
+
+    @step
+    def test_resources_listed_can_be_accessed(api):
+        """All the ids listed can be accessed."""
+        ids = api.get_resource_ids().data
+        for _id in ids[:10]:
+            api.get_resource(_id.id)
+
+
