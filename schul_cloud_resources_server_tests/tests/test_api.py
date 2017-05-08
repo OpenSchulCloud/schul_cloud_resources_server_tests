@@ -83,7 +83,22 @@ class TestAddResource:
         """Make sure all required attributes are set."""
         assertIsResponse(add_resource_response)
 
+    @step
+    def test_result_id_is_a_string(self, add_resource_response):
+        """The object id should be a string."""
+        assert isinstance(add_resource_response.data.id, str)
 
 
+class TestGetResources:
+    """Get added resources back."""
+
+    @step
+    def test_add_a_resource_and_retrieve_it(self, api, valid_resource):
+        """When we save a resource, we should be able to get it back."""
+        result = api.add_resource({"data": valid_resource})
+        _id = result.data.id
+        assert _id, "id should be in {}".format(result.to_dict())
+        copy = api.get_resource(_id).data.attributes
+        assert valid_resource == copy
 
 

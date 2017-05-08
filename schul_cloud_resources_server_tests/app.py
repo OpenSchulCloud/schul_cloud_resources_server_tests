@@ -83,7 +83,7 @@ def add_resource():
     resource = resource = add_request["data"]
     link = get_location_url(1)
     response.headers["Location"] = link
-    return response_object({"data": {"attributes": resource, "type":"resource"},
+    return response_object({"data": {"attributes": resource, "type":"resource", "id": "1"},
             "links": {"self":link}})
 
 @get(BASE + "/resources/<_id>")
