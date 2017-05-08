@@ -145,7 +145,7 @@ def get_resource_ids():
     """Return the list of current ids."""
     resources = get_resources()
     #response.content_type = 'application/vnd.api+json'
-    return {"data": [{"type": "id", "id": _id} for _id in resources]}
+    return response_object({"data": [{"type": "id", "id": _id} for _id in resources]})
 
 
 def main():

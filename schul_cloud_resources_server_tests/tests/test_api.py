@@ -192,12 +192,12 @@ class TestListResources:
     @step
     def test_all_ids_are_ids(self, list_response):
         """The listed ids are all ids."""
-        assert all(_id["type"] == "id" for _id in list_response.data)
+        assert all(_id.type == "id" for _id in list_response.data)
 
     @step
     def test_all_ids_are_unique(self, list_response):
         """The ids are only once in the list."""
-        ids = set(_id["id"] for _id in list_response.data)
+        ids = set(_id.id for _id in list_response.data)
         assert len(ids) == len(list_response.data)
 
     @step
@@ -206,16 +206,16 @@ class TestListResources:
         assertIsResponse(list_response)
 
     @step
-    def test_new_resources_are_listed(api, valid_resource):
+    def test_new_resources_are_listed(self, api, valid_resource):
         """Posting new resources adds them their ids to the list of ids."""
-        ids_before = set(_id["id"] for _id in api.get_resource_ids().data)
-        r1 = api.add_resource(valid_resource)
-        ids_after = set(_id["id"] for _id in api.get_resource_ids().data)
+        ids_before = set(_id.id for _id in api.get_resource_ids().data)
+        r1 = api.add_resource({"data": valid_resource})
+        ids_after = set(_id.id for _id in api.get_resource_ids().data)
         new_ids = ids_after - ids_before
-        assert r1.id in new_ids
+        assert r1.data.id in new_ids
 
     @step
-    def test_resources_listed_can_be_accessed(api):
+    def test_resources_listed_can_be_accessed(self, api):
         """All the ids listed can be accessed."""
         ids = api.get_resource_ids().data
         for _id in ids[:10]:
