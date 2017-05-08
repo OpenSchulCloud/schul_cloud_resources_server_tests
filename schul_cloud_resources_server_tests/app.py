@@ -59,6 +59,10 @@ api_keys = {
    "abcdefghijklmn": "valid1@schul-cloud.org"
 }
 
+def get_location_url(resource_id):
+    """Return the location orl of a resource given by id."""
+    return "http://" + request.headers["Host"] + BASE + "/resources/{}".format(resource_id)
+
 @post(BASE + "/resources")
 def add_resource():
     """Add a new resource."""
@@ -67,7 +71,7 @@ def add_resource():
     pprint(data)
     add_request = json.loads(data)
     resource = resource = add_request["data"]
-    link = "http://localhost:8080/v1/resources/1"
+    link = get_location_url(1)
     response.headers["Location"] = link
     return {"data": {"attributes": resource, "type":"resource"},
             "links": {"self":link}}

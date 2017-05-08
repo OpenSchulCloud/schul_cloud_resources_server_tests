@@ -1,5 +1,5 @@
 import requests
-from pytest import fixture
+from pytest import fixture, mark
 
 
 @step
@@ -63,9 +63,19 @@ class TestAddResource:
         response = auth_post(url + "/resources", json={"data":valid_resource})
         assert response.headers["Location"] == response.json()["links"]["self"]
 
+    @step
+    @mark.parametrize("host", ["google.de", "schul-cloud.org"])
+    def test_location_header_uses_host_header(self, auth_post, valid_resource, url, host):
+        """Post a new resource and the the location header. Which should be the self link.
 
-# TODO: test link uses the host header field
-
+        see http://jsonapi.org/format/#crud-creating
+        Additionally, use a different host header.
+        """
+        headers = ({"Host": host} if host else {})
+        response = auth_post(url + "/resources", headers=headers, json={"data":valid_resource})
+        location = response.headers["Location"].split("//", 1)[1]
+        assert location.startswith(host)
+        assert response.headers["Location"] == response.json()["links"]["self"]
 
 
 
