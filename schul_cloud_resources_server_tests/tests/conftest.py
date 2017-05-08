@@ -313,5 +313,3 @@ def request_with_headers(request, url):
     return request_with_headers
 
 
-
-

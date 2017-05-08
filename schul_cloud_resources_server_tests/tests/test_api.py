@@ -11,6 +11,7 @@ def test_server_is_reachable(url):
 
 
 @step
+@mark.test
 def test_valid_is_not_invalid_resource(valid_resource, invalid_resource):
     """A resource can not be valid and invalid at the same time.
 
@@ -101,4 +102,29 @@ class TestGetResources:
         copy = api.get_resource(_id).data.attributes
         assert valid_resource == copy
 
+    @step
+    def test_ressource_id_is_there(self, api, valid_resource):
+        """When a resource is retrieved, the id is sent with it."""
+        result = api.add_resource({"data": valid_resource})
+        server_copy = api.get_resource(result.data.id)
+        assert result.data.id == server_copy.data.id
+
+    @step
+    def test_ressource_type_is_set(self, api, valid_resource):
+        """When a resource is retrieved, the type is sent with it."""
+        result = api.add_resource({"data": valid_resource})
+        server_copy = api.get_resource(result.data.id)
+        assert result.data.type == "resource"
+
+    @step
+    def test_ressource_is_a_response(self, api, valid_resource):
+        """When a resource is retrieved, the type is sent with it."""
+        result = api.add_resource({"data": valid_resource})
+        assertIsResponse(result)
+
+@step
+@mark.test
+def test_there_are_at_least_two_valid_resources(valid_resources):
+    """For the next tests, we will need two distinct valid resssources."""
+    assert len(valid_resources) >= 2
 
