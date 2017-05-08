@@ -90,6 +90,9 @@ class TestAddResource:
         """The object id should be a string."""
         assert isinstance(add_resource_response.data.id, str)
 
+    # TODO: add a test for the absent data attribute
+    # TODO: add a test for a given id
+
 
 class TestGetResources:
     """Get added resources back."""
@@ -149,15 +152,26 @@ def test_add_two_different_resources(api, valid_resources):
     assert c2_2 == valid_resources[1]
 
 
-@step
-def test_deleted_resource_is_not_available(api, valid_resource):
-    """If a client deleted a resource, this resource should be absent afterwards."""
-    r1 = api.add_resource({"data": valid_resource})
-    api.delete_resource(r1.data.id)
-    with raises(ApiException) as error:
-        api.get_resource(r1.data.id)
-    assert error.value.status == 404
+class TestDeleteResource:
+    """Test the deletion of resources."""
 
+    @fixture
+    def get_error(self, api, valid_resource):
+        """Return an error that is created if a ressource is absent."""
+        r1 = api.add_resource({"data": valid_resource})
+        api.delete_resource(r1.data.id)
+        with raises(ApiException) as error:
+            api.get_resource(r1.data.id)
+        return error
 
+    @step
+    def test_deleted_resource_is_not_available(self, get_error):
+        """If a client deleted a resource, this resource should be absent afterwards."""
+        assert get_error.value.status == 404
+
+    @step
+    def test_deleted_resource_error(self, get_error):
+        """A deleted resource returns a valid error."""
+        assertIsError(get_error.body)
 
 
