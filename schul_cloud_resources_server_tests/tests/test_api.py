@@ -155,13 +155,14 @@ def test_add_two_different_resources(api, valid_resources):
 class TestDeleteResource:
     """Test the deletion of resources."""
 
-    @fixture
-    def get_error(self, api, valid_resource):
+    @fixture(params=["get_resource", "delete_resource"])
+    def get_error(self, api, valid_resource, request):
         """Return an error that is created if a ressource is absent."""
         r1 = api.add_resource({"data": valid_resource})
         api.delete_resource(r1.data.id)
+        action = getattr(api, request.param)
         with raises(ApiException) as error:
-            api.get_resource(r1.data.id)
+            action(r1.data.id)
         return error
 
     @step

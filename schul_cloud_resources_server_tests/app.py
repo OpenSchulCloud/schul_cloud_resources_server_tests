@@ -127,16 +127,15 @@ def get_resource(_id):
     """Get a resource identified by id."""
     resource = resources.get(_id)
     if resource is None:
-        abort(404, "The object with the id \"\" coul not be found.".format({_id}))
+        abort(404, "The resource with the id \"{}\" coul not be found.".format({_id}))
     return response_object({"data": {"attributes": resource, "id": _id, "type": "resource"}, })
 
 @delete(BASE + "/resources/<_id>")
 def delete_resource(_id):
     """Delete a saved resource."""
     resources = get_resources()
-    resources.pop(_id, None)
-#    if resources.pop(_id, None) is None:
-#        abort(404, "Resource not found.")
+    if resources.pop(_id, None) is None:
+        abort(404, "Resource {} not found.".format(_id))
 
 
 def main():
