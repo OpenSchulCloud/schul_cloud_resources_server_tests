@@ -67,8 +67,10 @@ def test_valid_is_not_invalid_resource(valid_resource, invalid_resource):
 def test_add_a_resource_and_get_id(api, valid_resource):
     """When adding a resource, we should get an id back."""
     result = api.add_resource(valid_resource)
+    print(result.data)
     assert isinstance(result.id, str)
 
+# TODO: test for location header
 
 @step
 def test_add_a_resource_and_retrieve_it(api, valid_resource):
