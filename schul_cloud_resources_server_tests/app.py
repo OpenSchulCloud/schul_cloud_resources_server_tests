@@ -148,6 +148,14 @@ def get_resource_ids():
     return response_object({"data": [{"type": "id", "id": _id} for _id in resources]})
 
 
+
+@delete(BASE + "/resources")
+def delete_resources():
+    """Delete all resources."""
+    resources = get_resources()
+    resources.clear()
+
+
 def main():
     """Start the serer from the command line."""
     port = (int(sys.argv[1]) if len(sys.argv) >= 2 else 8080)

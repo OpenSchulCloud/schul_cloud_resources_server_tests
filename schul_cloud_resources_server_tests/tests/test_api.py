@@ -29,8 +29,8 @@ class TestAddResource:
     - response
     - links
     - location header
-    - missing data
-    - additional id - whether it is taken
+    - missing data TODO
+    - additional id - whether it is taken TODO
     """
 
     @fixture
@@ -222,3 +222,25 @@ class TestListResources:
             api.get_resource(_id.id)
 
 
+class TestDeleteAllResources:
+    """Test the deletion of all posted resources."""
+
+    @step
+    @mark.parametrize("action", ["get_resource", "delete_resource"])
+    @mark.parametrize("add", [True, False])
+    def test_delete_all_resources_removes_resource(self, api, action, add, valid_resource):
+        """After all resources are deleted, they can not be accessed any more."""
+        if add:
+            ids = [api.add_resource({"data": valid_resource}).data]
+        else:
+            ids = api.get_resource_ids().data
+        api.delete_resources()
+        for _id in ids[:10]:
+            with raises(ApiException) as error:
+                getattr(api, action)(_id.id)
+            assert error.value.status == 404
+            assertIsError(error.value.body, 404)
+
+
+    def test_deleting_all_resources_returns_204(self, api):
+        assert False
