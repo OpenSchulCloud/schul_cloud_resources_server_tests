@@ -89,7 +89,7 @@ def add_resource():
 @get(BASE + "/resources/<_id>")
 def get_resource(_id):
     """Get a resource identified by id."""
-    return {"data": {"attributes": resource, "id": "1", "type": "resource"}, }
+    return response_object({"data": {"attributes": resource, "id": "1", "type": "resource"}, })
 
 
 
