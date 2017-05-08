@@ -30,6 +30,22 @@ BASE = "/v1"
 # global variables
 last_id = 0
 
+# set the error pages
+def _error(error, code):
+    """Return an error as json"""
+    _error = {
+        "status": code,
+        "title": errors[code],
+        "detail": error.body
+    }
+    traceback.print_exception(type(error), error, error.traceback)
+    return response_object(errors=[_error])
+
+for code in [404]:
+    error(code)(lambda error, code=code:_error(error, code))
+
+
+
 resources = {}
 
 class data(object):

@@ -1,9 +1,16 @@
+import json
+from schul_cloud_resources_server_tests.errors import errors as server_errors
+
+
 def to_dict(model):
     """Return a dictionary."""
     if hasattr(model, "to_dict"):
         return model.to_dict()
     if hasattr(model, "json"):
         return model.json()
+    if isinstance(model, str):
+        return json.loads(model)
+    assert isinstance(model, dict)
     return model
 
 

@@ -172,6 +172,6 @@ class TestDeleteResource:
     @step
     def test_deleted_resource_error(self, get_error):
         """A deleted resource returns a valid error."""
-        assertIsError(get_error.body)
+        assertIsError(get_error.value.body, 404)
 
 
