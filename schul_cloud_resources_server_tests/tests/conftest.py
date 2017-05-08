@@ -207,12 +207,20 @@ class User(object):
         """A string representation."""
         return "User(api, {}, {}, {})".format(self._auth_type, repr(self._name), repr(self._secret))
 
+    def get(self, url):
+        """Return a requests.get with authentication parameters."""
+        return requests.get(url)
 
 @pytest.fixture
 def user1(_user1, _api):
     """Return a user for the api with credentials."""
     return User(_api, *_user1)
 
+
+@pytest.fixture
+def auth_get(user1):
+    """Autheticated get request by requests."""
+    return user1.get
 
 @pytest.fixture
 def user1_auth2(_user1_auth2, _api):
