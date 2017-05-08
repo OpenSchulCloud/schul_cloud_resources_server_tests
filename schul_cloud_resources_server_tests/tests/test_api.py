@@ -60,11 +60,11 @@ class TestAddResource:
 
         see http://jsonapi.org/format/#crud-creating
         """
-        response = auth_post(url + "/resources", data={"data":valid_resource})
+        response = auth_post(url + "/resources", json={"data":valid_resource})
         assert response.headers["Location"] == response.json()["links"]["self"]
 
 
-
+# TODO: test link uses the host header field
 
 
 

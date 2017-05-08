@@ -63,10 +63,15 @@ api_keys = {
 def add_resource():
     """Add a new resource."""
     global resource
-    add_request = json.loads(touni(request.body.read()))
+    data = touni(request.body.read())
+    pprint(data)
+    add_request = json.loads(data)
     resource = resource = add_request["data"]
+    link = "http://localhost:8080/v1/resources/1"
+    response.headers["Location"] = link
     return {"data": {"attributes": resource, "type":"resource"},
-            "links": {"self":"http://localhost:8080/v1/resources/1"}}
+            "links": {"self":link}}
+
 
 @get(BASE + "/resources/<_id>")
 def get_resource(_id):

@@ -211,6 +211,10 @@ class User(object):
         """Return a requests.get with authentication parameters."""
         return requests.get(url)
 
+    def post(self, url, **kw):
+        """Return a requests.get with authentication parameters."""
+        return requests.post(url, **kw)
+
 @pytest.fixture
 def user1(_user1, _api):
     """Return a user for the api with credentials."""
@@ -221,6 +225,11 @@ def user1(_user1, _api):
 def auth_get(user1):
     """Autheticated get request by requests."""
     return user1.get
+
+@pytest.fixture
+def auth_post(user1):
+    """Autheticated post request by requests."""
+    return user1.post
 
 @pytest.fixture
 def user1_auth2(_user1_auth2, _api):
