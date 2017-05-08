@@ -114,13 +114,14 @@ class TestGetResources:
         """When a resource is retrieved, the type is sent with it."""
         result = api.add_resource({"data": valid_resource})
         server_copy = api.get_resource(result.data.id)
-        assert result.data.type == "resource"
+        assert server_copy.data.type == "resource"
 
     @step
     def test_ressource_is_a_response(self, api, valid_resource):
         """When a resource is retrieved, the type is sent with it."""
         result = api.add_resource({"data": valid_resource})
-        assertIsResponse(result)
+        server_copy = api.get_resource(result.data.id)
+        assertIsResponse(server_copy)
 
 @step
 @mark.test
