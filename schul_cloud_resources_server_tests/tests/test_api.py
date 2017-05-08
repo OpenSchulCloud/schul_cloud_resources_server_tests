@@ -123,9 +123,26 @@ class TestGetResources:
         server_copy = api.get_resource(result.data.id)
         assertIsResponse(server_copy)
 
+
 @step
 @mark.test
 def test_there_are_at_least_two_valid_resources(valid_resources):
     """For the next tests, we will need two distinct valid resssources."""
     assert len(valid_resources) >= 2
 
+
+@step
+def test_add_two_different_resources(api, valid_resources):
+    """When we post two different resources, we want the server to distinct them."""
+    r1 = api.add_resource({"data":valid_resources[0]})
+    c1_1 = api.get_resource(r1.data.id).data.attributes
+    r2 = api.add_resource({"data":valid_resources[1]})
+    c2_1 = api.get_resource(r2.data.id).data.attributes
+    c1_2 = api.get_resource(r1.data.id).data.attributes
+    c2_2 = api.get_resource(r2.data.id).data.attributes
+    c1_3 = api.get_resource(r1.data.id).data.attributes
+    assert c1_1 == valid_resources[0], "see test_add_a_resource_and_retrieve_it"
+    assert c1_2 == valid_resources[0]
+    assert c1_3 == valid_resources[0]
+    assert c2_1 == valid_resources[1]
+    assert c2_2 == valid_resources[1]

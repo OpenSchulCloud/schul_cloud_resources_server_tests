@@ -27,6 +27,11 @@ error = app.error
 # configuration constants
 BASE = "/v1"
 
+# global variables
+last_id = 0
+
+resources = {}
+
 class data(object):
     """The data interface the server operates with."""
 
@@ -49,6 +54,12 @@ class data(object):
         return resources
 
 
+def get_id():
+    """Return a new id."""
+    global last_id
+    last_id += 1
+    return  str(last_id)
+
 data.delete_resources()
 
 passwords = {
@@ -58,6 +69,8 @@ passwords = {
 api_keys = {
    "abcdefghijklmn": "valid1@schul-cloud.org"
 }
+
+
 
 def get_location_url(resource_id):
     """Return the location orl of a resource given by id."""
@@ -76,20 +89,22 @@ def response_object(cnf={}, **kw):
 @post(BASE + "/resources")
 def add_resource():
     """Add a new resource."""
-    global resource
+    _id = get_id()
     data = touni(request.body.read())
     pprint(data)
     add_request = json.loads(data)
     resource = resource = add_request["data"]
-    link = get_location_url(1)
+    link = get_location_url(_id)
+    resources[_id] = resource
     response.headers["Location"] = link
-    return response_object({"data": {"attributes": resource, "type":"resource", "id": "1"},
+    return response_object({"data": {"attributes": resource, "type":"resource", "id": _id},
             "links": {"self":link}})
+
 
 @get(BASE + "/resources/<_id>")
 def get_resource(_id):
     """Get a resource identified by id."""
-    return response_object({"data": {"attributes": resource, "id": "1", "type": "resource"}, })
+    return response_object({"data": {"attributes": resources[_id], "id": _id, "type": "resource"}, })
 
 
 
