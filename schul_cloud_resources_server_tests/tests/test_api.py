@@ -1,6 +1,7 @@
 import requests
-from pytest import fixture, mark
+from pytest import fixture, mark, raises
 from schul_cloud_resources_server_tests.tests.assertions import *
+from schul_cloud_resources_api_v1.rest import ApiException
 
 
 @step
@@ -146,3 +147,17 @@ def test_add_two_different_resources(api, valid_resources):
     assert c1_3 == valid_resources[0]
     assert c2_1 == valid_resources[1]
     assert c2_2 == valid_resources[1]
+
+
+@step
+def test_deleted_resource_is_not_available(api, valid_resource):
+    """If a client deleted a resource, this resource should be absent afterwards."""
+    r1 = api.add_resource({"data": valid_resource})
+    api.delete_resource(r1.data.id)
+    with raises(ApiException) as error:
+        api.get_resource(r1.data.id)
+    assert error.value.status == 404
+
+
+
+

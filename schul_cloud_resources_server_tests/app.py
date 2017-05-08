@@ -60,6 +60,10 @@ def get_id():
     last_id += 1
     return  str(last_id)
 
+def get_resources():
+    """Return the resources."""
+    return resources
+
 data.delete_resources()
 
 passwords = {
@@ -90,10 +94,11 @@ def response_object(cnf={}, **kw):
 def add_resource():
     """Add a new resource."""
     _id = get_id()
+    resources = get_resources()
     data = touni(request.body.read())
     pprint(data)
     add_request = json.loads(data)
-    resource = resource = add_request["data"]
+    resource = add_request["data"]
     link = get_location_url(_id)
     resources[_id] = resource
     response.headers["Location"] = link
@@ -104,8 +109,18 @@ def add_resource():
 @get(BASE + "/resources/<_id>")
 def get_resource(_id):
     """Get a resource identified by id."""
-    return response_object({"data": {"attributes": resources[_id], "id": _id, "type": "resource"}, })
+    resource = resources.get(_id)
+    if resource is None:
+        abort(404, "The object with the id \"\" coul not be found.".format({_id}))
+    return response_object({"data": {"attributes": resource, "id": _id, "type": "resource"}, })
 
+@delete(BASE + "/resources/<_id>")
+def delete_resource(_id):
+    """Delete a saved resource."""
+    resources = get_resources()
+    resources.pop(_id, None)
+#    if resources.pop(_id, None) is None:
+#        abort(404, "Resource not found.")
 
 
 def main():
