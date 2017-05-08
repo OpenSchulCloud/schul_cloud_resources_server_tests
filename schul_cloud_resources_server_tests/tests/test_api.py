@@ -43,7 +43,7 @@ class TestAddResource:
     @step
     def test_type_is_resource(self, add_resource_response):
         """The tpe must be set to "resource"."""
-        assert add_resource_response.type == "resource"
+        assert add_resource_response.data.type == "resource"
 
     @step
     def test_self_link_links_to_resource(

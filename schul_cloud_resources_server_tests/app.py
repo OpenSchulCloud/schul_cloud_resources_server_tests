@@ -64,7 +64,7 @@ def add_resource():
     """Add a new resource."""
     add_request = json.loads(touni(request.body.read()))
     resource = resource = add_request["data"]
-    return {"data": {"attributes": resource}}
+    return {"data": {"attributes": resource, "type":"resource"}}
 
 
 def main():
