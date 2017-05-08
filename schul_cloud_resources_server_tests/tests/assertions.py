@@ -3,7 +3,7 @@ from schul_cloud_resources_server_tests.errors import errors as server_errors
 import sys
 
 if sys.version_info[0] == 2:
-    STRING_TYPE = unicode
+    STRING_TYPE = basestring
 else:
     STRING_TYPE = str
 
