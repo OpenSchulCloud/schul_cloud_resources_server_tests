@@ -184,7 +184,7 @@ def add_resource():
         abort(422, str(error))
     _id = add_request["data"].get("id", get_id())
     if not isinstance(_id, str) or not re.match("^([!*\"'(),+a-zA-Z0-9$_@.&+-]|%[0-9a-fA-F]{2})+$", _id):
-        abort(403, "The id \"{}\" is invalid, can not be part of a url.".format(_id))
+        abort(403, "The id {} is invalid, can not be part of a url.".format(repr(_id)))
     if _id in resources or _id == "ids":
         abort(403, "The id \"{}\" already exists.".format(_id))
     resources[_id] = resource
