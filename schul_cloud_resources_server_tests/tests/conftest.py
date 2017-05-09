@@ -284,26 +284,4 @@ _steps = []
 __builtins__["step"] = step
 
 
-# json api fixtures
-
-_example_json = json.dumps(get_valid_examples()[0])
-
-@pytest.fixture(params=[
-        lambda url, headers: requests.get(url + "/resources/ids",
-                                          headers=headers, data=_example_json),
-        lambda url, headers: requests.delete(url + "/resources",
-                                             headers=headers, data=_example_json),
-    ]) # TODO: add delete, post, ... all endpoints
-def request_with_headers(request, url):
-    """Return a function to pass the headers to.
-
-    This function sends http requests to the server.
-    The requests.response object is returned.
-    """
-    get_request = request.param
-    def request_with_headers(headers):
-        """Set the headers of the request and send it to the server."""
-        return get_request(url, headers)
-    return request_with_headers
-
 

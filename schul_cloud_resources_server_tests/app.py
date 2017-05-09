@@ -39,9 +39,10 @@ def _error(error, code):
         "detail": error.body
     }
     traceback.print_exception(type(error), error, error.traceback)
+    response.headers["Content-Type"] = "application/vnd.api+json"
     return response_object(errors=[_error])
 
-for code in [404]:
+for code in [404, 415]:
     error(code)(lambda error, code=code:_error(error, code))
 
 
@@ -105,10 +106,22 @@ def response_object(cnf={}, **kw):
         description="A test server to test crawlers agains the resources api.")
     return json.dumps(kw)
 
+def test_jsonapi_header():
+    """Make sure that the content type is set accordingly.
+
+    http://jsonapi.org/format/#content-negotiation-clients
+    """
+    content_type = request.headers["Content-Type"]
+    content_type_expected = "application/vnd.api+json"
+    if content_type != content_type_expected:
+        abort(415, "The Content-Type header must be \"{}\", not \"{}\".".format(
+                   content_type_expected, content_type))
+
 
 @post(BASE + "/resources")
 def add_resource():
     """Add a new resource."""
+    test_jsonapi_header()
     _id = get_id()
     resources = get_resources()
     data = touni(request.body.read())
@@ -118,6 +131,7 @@ def add_resource():
     link = get_location_url(_id)
     resources[_id] = resource
     response.headers["Location"] = link
+    response.status = 201
     return response_object({"data": {"attributes": resource, "type":"resource", "id": _id},
             "links": {"self":link}})
 

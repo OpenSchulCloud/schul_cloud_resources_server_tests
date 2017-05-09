@@ -63,7 +63,10 @@ class TestAddResource:
 
         see http://jsonapi.org/format/#crud-creating
         """
-        response = user1.post(url + "/resources", json={"data":valid_resource})
+        response = user1.post(url + "/resources",
+                              headers={"Content-Type": "application/vnd.api+json"},
+                              json={"data":valid_resource})
+        assert response.status_code == 201
         assert response.headers["Location"] == response.json()["links"]["self"]
 
     @step
@@ -75,6 +78,7 @@ class TestAddResource:
         Additionally, use a different host header.
         """
         headers = ({"Host": host} if host else {})
+        headers["Content-Type"] = "application/vnd.api+json"
         response = user1.post(url + "/resources", headers=headers, json={"data":valid_resource})
         location = response.headers["Location"].split("//", 1)[1]
         assert location.startswith(host)
@@ -257,4 +261,58 @@ def test_there_are_invalid_resources(api, invalid_resources):
     If this test fails, the following tests may now work because of this.
     """
     assert invalid_resources
+
+
+class TestInvalidRequests:
+    """Some requests may be malformed.
+
+    Here, we test that the output is malformed and the response is usable.
+    """
+
+    class TestUnsupportedMediaType:
+        """
+        Servers MUST respond with a 415 Unsupported Media Type status code 
+        if a request specifies the header 
+            Content-Type: application/vnd.api+json
+        with any media type parameters.
+        """
+
+        INVALID_MEDIA_TYPES = [
+                "", "application/json", "application/vnd.api+json; version=1"
+            ]
+
+        @fixture(params=INVALID_MEDIA_TYPES)
+        def response_to_invalid_content_type(self, request, url, a_valid_resource):
+            return requests.post(url + "/resources",
+                                 headers={"Content-Type": request.param,
+                                          "Accept": "application/vnd.api+json"},
+                                 data=json.dumps({"data":a_valid_resource}))
+
+        @step
+        def test_invalid_content_type_header_is_an_error(
+                self, response_to_invalid_content_type):
+            """Send possible requests to the server with a malformed header.
+            The error returned should be in the jsonapi format."""
+            assertIsError(response_to_invalid_content_type, 415)
+
+        @step
+        def test_invalid_content_type_header_has_the_right_content_type(
+                self, response_to_invalid_content_type):
+            """Send possible requests to the server and set no header."""
+            assert response_to_invalid_content_type.headers["Content-Type"] == "application/vnd.api+json"
+
+        # TODO: test invalid Accept header
+        # TODO: test valid accept headers  */* application/* and application/vnd.api+json
+    # TODO: test absent data attribute
+    # TODO: Test invalid json schema
+    #        invalid json
+
+
+
+
+
+
+
+
+
 
