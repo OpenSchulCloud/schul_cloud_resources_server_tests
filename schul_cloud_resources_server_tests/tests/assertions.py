@@ -23,7 +23,7 @@ def to_dict(model):
     return model
 
 
-def assertIsResponse(response):
+def assertIsResponse(response, link_self="TODO"):
     response = to_dict(response)
     assert ("errors" in response) ^ ("data" in response), "The members data and errors MUST NOT coexist in the same document. http://jsonapi.org/format/#conventions"
     assert ("data" in response if "included" in response else True), "If a document does not contain a top-level data key, the included member MUST NOT be present either. http://jsonapi.org/format/#conventions"
@@ -33,6 +33,13 @@ def assertIsResponse(response):
     for attr in ["name", "source", "description"]:
         assert attr in jsonapi, "{} must be present, see #/definition/Jsonapi".format(attr)
         assert isinstance(attr, STRING_TYPE)
+    if link_self is not None:
+       assert link_self != "TODO", "Change the test case source code to include the url."
+       assert "links" in response
+       assert isinstance(response["links"], dict)
+       assert "self" in response["links"] or "_self" in response["links"]
+       link = response["links"].get("self", response["links"].get("_self"))
+       assert link == link_self
 
 
 def assertIsError(response, status):
@@ -43,7 +50,7 @@ def assertIsError(response, status):
     - updated: https://github.com/schul-cloud/resources-api-v1/blob/master/api-definition/swagger.yaml#L292
     """
     response = to_dict(response)
-    assertIsResponse(response)
+    assertIsResponse(response, None)
     assert "errors" in response, "errors must be present"
     errors = response["errors"]
     assert isinstance(errors, list)

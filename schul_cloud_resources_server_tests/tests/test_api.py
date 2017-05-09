@@ -105,19 +105,16 @@ class TestAddResource:
         assert location.startswith(host)
         assert response.headers["Location"] == response.json()["links"]["self"]
 
+
     @step
-    def test_creation_is_response(self, add_resource_response):
+    def test_creation_is_response(self, add_resource_response, url):
         """Make sure all required attributes are set."""
-        assertIsResponse(add_resource_response)
+        assertIsResponse(add_resource_response, url + "/resources/" + add_resource_response.data.id)
 
     @step
     def test_result_id_is_a_string(self, add_resource_response):
         """The object id should be a string."""
         assert isinstance(add_resource_response.data.id, str)
-
-    # TODO: add a test for the absent data attribute
-    # TODO: add a test for a given id
-
 
 class TestGetResources:
     """Get added resources back."""
@@ -146,11 +143,11 @@ class TestGetResources:
         assert server_copy.data.type == "resource"
 
     @step
-    def test_ressource_is_a_response(self, api, valid_resource):
+    def test_ressource_is_a_response(self, api, valid_resource, url):
         """When a resource is retrieved, the type is sent with it."""
         result = api.add_resource(resource_dict(valid_resource))
         server_copy = api.get_resource(result.data.id)
-        assertIsResponse(server_copy)
+        assertIsResponse(server_copy, url + "/resources/" + result.data.id)
 
 
 @step
@@ -226,9 +223,9 @@ class TestListResources:
         assert len(ids) == len(list_response.data)
 
     @step
-    def test_valid_jsonapi_response(self, list_response):
+    def test_valid_jsonapi_response(self, list_response, url):
         """The response shoule be a json api response."""
-        assertIsResponse(list_response)
+        assertIsResponse(list_response, url + "/resources/ids")
 
     @step
     def test_new_resources_are_listed(self, api, valid_resource):
@@ -426,17 +423,17 @@ class TestPostWithId:
 
     @step
     @mark.parametrize("invalid_id", [
-            1, "asd\x00", "%", "%1", "%Ga", "jsdlfhasdjlkfkjdsalkf\\"
+            1, "asd\x00", "%", "%1", "%Ga", "jsdlfhasdjlkfkjdsalkf\\", "ids",
         ] + [chr(i) for i in range(256) if chr(i) not in '!*"\'(),+abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$_@.&+-'])
-    def test_invalid_ids(self, api, invalid_id, a_valid_resource):
+    def test_invalid_ids(self, a_user, invalid_id, a_valid_resource):
         """Test what happens with invalid ids."""
         with raises(ApiException) as error:
-            api.add_resource(resource_dict(a_valid_resource, id=invalid_id))
+            a_user.api.add_resource(resource_dict(a_valid_resource, id=invalid_id))
         assert error.value.status == 403
         assertIsError(error.value.body, 403)
         
 
-class TestIdCreation:
+class TestIdCreationByDatabase:
     """Test the ids which are created by the database.
 
     Exclude that ids are doubled.
@@ -555,6 +552,7 @@ class TestAuthentication:
         with raises(ApiException) as error:
             action(invalid_user.api, a_valid_resource)
         assert error.value.status == 401
+        assertIsError(error.value.body, 401)
 
     @step
     @mark.parametrize("header", [
@@ -566,6 +564,7 @@ class TestAuthentication:
         result = requests.get(url + "/resources/ids",
                               headers={"Authorization": header})
         assert result.status_code == 401
+        assertIsError(result, 401)
 
 
 # TODO: test links and jsonapi properties of get resource and get resource ids

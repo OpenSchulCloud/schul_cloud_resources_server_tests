@@ -43,7 +43,7 @@ def _error(error, code):
     response.headers["Content-Type"] = "application/vnd.api+json"
     return response_object(errors=[_error])
 
-for code in [403, 404, 415, 422]:
+for code in [401, 403, 404, 415, 422]:
     error(code)(lambda error, code=code:_error(error, code))
 
 
@@ -186,7 +186,7 @@ def add_resource():
     link = get_location_url(_id)
     if not isinstance(_id, str) or not re.match("^([!*\"'(),+a-zA-Z0-9$_@.&+-]|%[0-9a-fA-F]{2})+$", _id):
         abort(403, "The id \"{}\" is invalid, can not be part of a url.".format(_id))
-    if _id in resources:
+    if _id in resources or _id == "ids":
         abort(403, "The id \"{}\" already exists.".format(_id))
     resources[_id] = resource
     response.headers["Location"] = link
@@ -204,7 +204,8 @@ def get_resource(_id):
     resource = resources.get(_id)
     if resource is None:
         abort(404, "The resource with the id \"{}\" could not be found.".format(_id))
-    return response_object({"data": {"attributes": resource, "id": _id, "type": "resource"}, })
+    return response_object({"data": {"attributes": resource, "id": _id, "type": "resource"}, 
+                            "links": {"self": get_location_url(_id)}})
 
 
 @delete(BASE + "/resources/<_id>")
@@ -219,7 +220,8 @@ def get_resource_ids():
     """Return the list of current ids."""
     resources = get_resources()
     #response.content_type = 'application/vnd.api+json'
-    return response_object({"data": [{"type": "id", "id": _id} for _id in resources]})
+    return response_object({"data": [{"type": "id", "id": _id} for _id in resources], 
+                            "links": {"self": get_location_url("ids")}})
 
 
 

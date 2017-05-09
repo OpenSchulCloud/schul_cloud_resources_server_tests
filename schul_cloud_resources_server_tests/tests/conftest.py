@@ -115,6 +115,9 @@ def pytest_generate_tests(metafunc):
     """
     if "all_credentials"  in metafunc.fixturenames:
         metafunc.parametrize("all_credentials", [get_credentials(metafunc)])
+    if "a_user" in metafunc.fixturenames:
+        credentials = get_credentials(metafunc)
+        metafunc.parametrize("_a_user", credentials[:1])
     if "_user2" in metafunc.fixturenames and \
         "_user1_auth2" in metafunc.fixturenames:
         raise NotImplementedError()
@@ -245,6 +248,16 @@ class User(object):
 def user1(_user1, _api):
     """Return a user for the api with credentials."""
     return User(_api, *_user1)
+
+
+@pytest.fixture
+def a_user(_a_user, _api):
+    """Return a user for the api with credentials.
+    
+    This fixture uses only one authentication mechanism.
+    It does not multiply the tests.
+    """
+    return User(_api, *_a_user)
 
 
 @pytest.fixture
