@@ -66,8 +66,22 @@ class TestAddResource:
         response = user1.post(url + "/resources",
                               headers={"Content-Type": "application/vnd.api+json"},
                               json={"data":valid_resource})
-        assert response.status_code == 201
         assert response.headers["Location"] == response.json()["links"]["self"]
+
+
+    @step
+    @mark.parametrize("accept_header", ["*/*", "application/*", "application/vnd.api+json"])
+    def test_different_accept_headers(self, user1, valid_resource, url, accept_header):
+        """Test that the accept header is one of "*/*", "application/*", "application/vnd.api+json".
+
+        see https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html
+        """
+        response = user1.post(url + "/resources",
+                              headers={"Content-Type": "application/vnd.api+json",
+                                       "Accept": accept_header},
+                              json={"data":valid_resource})
+        assert response.status_code == 201
+        
 
     @step
     @mark.parametrize("host", ["google.de", "schul-cloud.org"])
@@ -277,15 +291,22 @@ class TestInvalidRequests:
         with any media type parameters.
         """
 
-        INVALID_MEDIA_TYPES = [
-                "", "application/json", "application/vnd.api+json; version=1"
+        INVALID_MEDIA_TYPES = [ # Content-Type, Accept
+                ("", "application/vnd.api+json"),
+                ("application/json", "application/vnd.api+json"), 
+                ("application/vnd.api+json; version=1", "application/vnd.api+json"),
+                ("application/vnd.api+json", ""),
+                ("application/vnd.api+json", "application/json"),
+                ("application/vnd.api+json", "application/vnd.api+json; version=1"),
+                ("application/vnd.api+json", "*/*; version=1"),
+                ("application/vnd.api+json", "application/*; version=1"),
             ]
 
         @fixture(params=INVALID_MEDIA_TYPES)
         def response_to_invalid_content_type(self, request, url, a_valid_resource):
             return requests.post(url + "/resources",
-                                 headers={"Content-Type": request.param,
-                                          "Accept": "application/vnd.api+json"},
+                                 headers={"Content-Type": request.param[0],
+                                          "Accept": request.param[1]},
                                  data=json.dumps({"data":a_valid_resource}))
 
         @step

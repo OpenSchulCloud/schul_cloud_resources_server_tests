@@ -111,11 +111,16 @@ def test_jsonapi_header():
 
     http://jsonapi.org/format/#content-negotiation-clients
     """
-    content_type = request.headers["Content-Type"]
+    content_type = request.content_type
     content_type_expected = "application/vnd.api+json"
     if content_type != content_type_expected:
         abort(415, "The Content-Type header must be \"{}\", not \"{}\".".format(
                    content_type_expected, content_type))
+    accept = request.headers["Accept"]
+    expected_accept = ["*/*", "application/*", "application/vnd.api+json"]
+    if accept not in expected_accept:
+        abort(415, "The Accept header must one of \"{}\", not \"{}\".".format(
+                   expected_accept, accept))
 
 
 @post(BASE + "/resources")
