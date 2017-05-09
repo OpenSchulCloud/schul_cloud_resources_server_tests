@@ -398,12 +398,14 @@ class TestPostWithId:
         ])
     def test_a_present_id_is_accepted(self, api, valid_resource, _id):
         """If an id is given for the object, it should be used to store the object."""
+        api.delete_resources()
         response = api.add_resource(resource_dict(valid_resource, id=_id))
         assert response.data.id == _id
 
     @step
     def test_a_present_id_is_reachable(self, api, valid_resource):
         """If an id is given for the object, it should be used to store the object."""
+        api.delete_resources()
         response = api.add_resource(resource_dict(valid_resource, id="test"))
         copy = api.get_resource("test")
         assert copy.data.attributes == valid_resource
@@ -415,22 +417,23 @@ class TestPostWithId:
 
         see http://jsonapi.org/format/#crud-creating-client-ids
         """
+        api.delete_resources()
         response = api.add_resource(resource_dict(valid_resource, id="id"))
         with raises(ApiException) as error:
             api.add_resource(resource_dict(valid_resource, id="id"))
         assert error.value.status == 403
-        assertIsError(get_error.value.body, 403)
+        assertIsError(error.value.body, 403)
 
     @step
     @mark.parametrize("invalid_id", [
-            1, "asd\x00", "%", "%1", "%Ga",
+            1, "asd\x00", "%", "%1", "%Ga", "jsdlfhasdjlkfkjdsalkf\\"
         ] + [chr(i) for i in range(256) if chr(i) not in '!*"\'(),+abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$_@.&+-'])
-    def test_invalid_ids(self, api, invalid_id, valid_resource):
+    def test_invalid_ids(self, api, invalid_id, a_valid_resource):
         """Test what happens with invalid ids."""
         with raises(ApiException) as error:
-            api.add_resource(resource_dict(valid_resource, id=invalid_id))
+            api.add_resource(resource_dict(a_valid_resource, id=invalid_id))
         assert error.value.status == 403
-        assertIsError(get_error.value.body, 403)
+        assertIsError(error.value.body, 403)
         
 
 

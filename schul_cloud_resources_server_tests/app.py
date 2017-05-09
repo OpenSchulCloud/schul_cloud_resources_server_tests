@@ -4,6 +4,7 @@ import jsonschema
 import base64
 import traceback
 import os
+import re
 HERE = os.path.dirname(__file__)
 try:
     import schul_cloud_resources_server_tests
@@ -42,7 +43,7 @@ def _error(error, code):
     response.headers["Content-Type"] = "application/vnd.api+json"
     return response_object(errors=[_error])
 
-for code in [404, 415, 422]:
+for code in [403, 404, 415, 422]:
     error(code)(lambda error, code=code:_error(error, code))
 
 
@@ -149,6 +150,10 @@ def add_resource():
         abort(422, str(error))
     _id = add_request["data"].get("id", get_id())
     link = get_location_url(_id)
+    if not isinstance(_id, str) or not re.match("^([!*\"'(),+a-zA-Z0-9$_@.&+-]|%[0-9a-fA-F]{2})+$", _id):
+        abort(403, "The id \"{}\" is invalid, can not be part of a url.".format(_id))
+    if _id in resources:
+        abort(403, "The id \"{}\" already exists.".format(_id))
     resources[_id] = resource
     response.headers["Location"] = link
     response.status = 201
