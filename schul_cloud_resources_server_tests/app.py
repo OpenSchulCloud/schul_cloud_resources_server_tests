@@ -47,9 +47,6 @@ for code in [403, 404, 415, 422]:
     error(code)(lambda error, code=code:_error(error, code))
 
 
-
-resources = {}
-
 class data(object):
     """The data interface the server operates with."""
 
@@ -78,10 +75,6 @@ def get_id():
     last_id += 1
     return  str(last_id)
 
-def get_resources():
-    """Return the resources."""
-    return resources
-
 data.delete_resources()
 
 passwords = {
@@ -91,6 +84,47 @@ passwords = {
 api_keys = {
    "abcdefghijklmn": "valid1@schul-cloud.org"
 }
+
+HEADER_ERROR = "Malfomred Authorization header."
+
+def get_api_key():
+    """Return the api key or None."""
+    header = request.headers.get('Authorization')
+    if not header: return
+    try:
+        method, data = header.split(None, 1)
+        if method.lower() != 'api-key': return
+        return touni(base64.b64decode(tob(data[4:])))
+    except (ValueError, TypeError):
+        abort(401, HEADER_ERROR) 
+
+BASIC_ERROR = "Could not do basic authentication. Wrong username or password."
+API_KEY_ERROR = "Could not authenticate using the given api key."
+
+def get_resources():
+    """Return the resources of the authenticated user.
+
+    If authentication failed, this aborts the execution with
+    401 Unauthorized.
+    """
+    pprint(dict(request.headers))
+    header = request.environ.get('HTTP_AUTHORIZATION','')
+    if header:
+        print("Authorization:", header)
+    basic = request.auth
+    if basic:
+        username, password = basic
+        if passwords.get(username) != password:
+            abort(401, BASIC_ERROR)
+    else:
+        api_key = get_api_key()
+        if api_key is not None:
+            username = api_keys.get(api_key)
+            if username is None:
+                abort(401, API_KEY_ERROR)
+        else:
+            username = None
+    return _resources[username]
 
 
 
@@ -166,9 +200,10 @@ def get_resource(_id):
     """Get a resource identified by id."""
     if _id == "ids":
         return get_resource_ids()
+    resources = get_resources()
     resource = resources.get(_id)
     if resource is None:
-        abort(404, "The resource with the id \"{}\" coul not be found.".format({_id}))
+        abort(404, "The resource with the id \"{}\" could not be found.".format(_id))
     return response_object({"data": {"attributes": resource, "id": _id, "type": "resource"}, })
 
 

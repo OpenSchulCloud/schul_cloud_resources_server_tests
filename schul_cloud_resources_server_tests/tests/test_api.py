@@ -436,8 +436,139 @@ class TestPostWithId:
         assertIsError(error.value.body, 403)
         
 
+class TestIdCreation:
+    """Test the ids which are created by the database.
+
+    Exclude that ids are doubled.
+    """
 
 
+    @step
+    def deleting_and_adding_a_resource_creates_a_new_id(self, api, valid_ressorce):
+        """When a resource is added and deleted and added,
+        the id of existing resources are not taken."""
+        ids = [api.add_resource(valid_resource).data.id for i in range(4)]
+        api.delete_resource(ids[1])
+        r = api.add_resource(valid_resource)
+        assert r.data.id not in ids
+
+
+    @step
+    def test_posting_and_deleting_a_resource_leaves_other_resource_intact(
+            self, api, valid_resources):
+        """When several ressoruces are posted, they are left intact if reposted."""
+        ids = [api.add_resource(resource_dict(valid_resources[0])).data.id for i in range(4)]
+        api.delete_resource(ids.pop(2))
+        r = api.add_resource(resource_dict(valid_resources[1]))
+        for _id in ids:
+            resource = api.get_resource(_id)
+            assert resource.data.attributes == valid_resources[0]
+
+
+ERROR_NEED_MORE_CREDENTIALS = "Please pass additional authentication arguments."
+
+class TestAuthentication:
+    """Test the authentication mechanism.
+
+    This includes:
+
+    - different users can not see eachother
+    - same users can post with different authentication machanisms
+    - unauthenticated user can not see anything from other users
+    - invalid username, password, api key
+    - malformed Authorize header
+    - empty username, password, api key
+    """
+
+    @step
+    def test_user_provided_credentials(self, all_credentials):
+        """To make the tests work, the user should provide credentials."""
+        assert len(all_credentials) >= 2, ERROR_NEED_MORE_CREDENTIALS
+
+    @step
+    class TestTest:
+        """Test the tests"""
+
+        def test_users_are_always_unequal(self, user1, user2):
+            """user1 and user2 are never the same."""
+            assert user1.name != user2.name
+            assert user1.credentials != user2.credentials
+
+        def test_different_auths_have_the_same_name(self, user1, user1_auth2):
+            """user1 is the same user as user1_auth2 but uses a different
+            authentication mechanism"""
+            assert user1.name == user1_auth2.name
+            assert user1.credentials != user1_auth2.credentials
+
+    @step
+    def test_cannot_cross_post(self, user1, user2, a_valid_resource):
+        """Two disjoint users can not access each others objects."""
+        ids = [_id.id for _id in user2.api.get_resource_ids().data]
+        for i in range(len(ids) + 1):
+            r = user1.api.add_resource(resource_dict(a_valid_resource))
+            if r.data.id not in ids:
+                break
+        else:
+            assert False, "This isnot expected."
+        ids = [_id.id for _id in user2.api.get_resource_ids().data]
+        assert r.data.id not in ids, "{} and {} must not access the same resources.".format(user1, user2)
+
+    @step
+    def test_cannot_cross_delete(self, user1, user2, a_valid_resource):
+        """Two users can not delete each other's resources."""
+        r = user1.api.add_resource(resource_dict(a_valid_resource))
+        try:
+            user2.api.delete_resource(r.data.id)
+        except ApiException:
+            pass
+        resource = user1.api.get_resource(r.data.id)
+        assert resource.data.attributes == a_valid_resource
+
+    def assertSameIds(self, user1, user1_auth2):
+        """Make sure the ids are the same."""
+        ids1 = user1.api.get_resource_ids()
+        ids2 = user1_auth2.api.get_resource_ids()
+        assert ids1 == ids2
+
+    @step
+    def test_same_user_can_view_resources_with_different_auth(
+            self, user1, user1_auth2, a_valid_resource):
+        """Regardless of the authentication mechanism, the user can view 
+        the resource."""
+        self.assertSameIds(user1, user1_auth2)
+        r = user1.api.add_resource(resource_dict(a_valid_resource))
+        self.assertSameIds(user1, user1_auth2)
+        user1_auth2.api.delete_resource(r.data.id)
+        self.assertSameIds(user1, user1_auth2)
+
+    @step
+    @mark.parametrize("action", [
+            lambda api, res: api.add_resource(res),
+            lambda api, res: api.get_resource_ids(),
+            lambda api, res: api.delete_resource("64682437"),
+            lambda api, res: api.get_resource("tralala"),
+            lambda api, res: api.delete_resources()
+        ])
+    def test_invalid_user_can_not_access_the_api(
+            self, action, invalid_user, a_valid_resource):
+        """The invalid user gets a 401 unauthorized all the time."""
+        with raises(ApiException) as error:
+            action(invalid_user.api, a_valid_resource)
+        assert error.value.status == 401
+
+    @step
+    @mark.parametrize("header", [
+            "api-key yek=aaaaaa", "api-key",
+            "blablabla", "api-key key=aaaaaa,asd=asd"
+        ])
+    def test_unspecified_authorization_headers_yield_401(self, url, header):
+        """"""
+        result = requests.get(url + "/resources/ids",
+                              headers={"Authorization": header})
+        assert result.status_code == 401
+
+
+# TODO: test links and jsonapi properties of get resource and get resource ids
 
 
 

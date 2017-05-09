@@ -18,11 +18,13 @@ import zipfile
 import json
 import shutil
 import os
+import base64
 import schul_cloud_resources_api_v1.auth as auth
 from schul_cloud_resources_api_v1.rest import ApiException
 from schul_cloud_resources_api_v1 import ApiClient, ResourceApi
 from schul_cloud_resources_api_v1.schema import get_valid_examples, get_invalid_examples
 from schul_cloud_resources_server_tests.tests.fixtures import *
+from bottle import touni, tob
 
 
 NUMBER_OF_VALID_RESSOURCES = 3
@@ -203,21 +205,41 @@ class User(object):
         self.authenticate()
         return self._api
 
+    def _get_auth_headers(self, headers):
+        """Return the Authorization headers."""
+        r = headers.copy()
+        if self._auth_type == "noauth":
+            pass
+        elif self._auth_type == "basic":
+            credentials = touni(base64.b64encode(tob(self._name + ":" + self._secret)))
+            r.setdefault("Authorization", "basic " + credentials)
+        elif self._auth_type == "apikey":
+            credentials = touni(base64.b64encode(tob(self._secret)))
+            r.setdefault("Authorization", "api-key key=" + credentials)
+        else:
+            raise ValueError(self._auth_type)
+        return r
+
     def __repr__(self):
         """A string representation."""
         return "User(api, {}, {}, {})".format(self._auth_type, repr(self._name), repr(self._secret))
 
-    def get(self, url):
+    def _add_auth_headers(self, kw):
+        """Embed the authenticatin headers into to key words"""
+        kw["headers"] = self._get_auth_headers(kw.get("headers", {}))
+        return kw
+
+    def get(self, url, **kw):
         """Return a requests.get with authentication parameters."""
-        return requests.get(url)
+        return requests.get(url, **self._add_auth_headers(kw))
 
     def post(self, url, **kw):
         """Return a requests.get with authentication parameters."""
-        return requests.post(url, **kw)
+        return requests.post(url, **self._add_auth_headers(kw))
 
     def delete(self, url, **kw):
         """Return a requests.get with authentication parameters."""
-        return requests.delete(url, **kw)
+        return requests.delete(url, **self._add_auth_headers(kw))
 
 @pytest.fixture
 def user1(_user1, _api):
