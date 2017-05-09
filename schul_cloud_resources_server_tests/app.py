@@ -127,7 +127,6 @@ def test_jsonapi_header():
 def add_resource():
     """Add a new resource."""
     test_jsonapi_header()
-    _id = get_id()
     resources = get_resources()
     try:
         data = touni(request.body.read())
@@ -148,6 +147,7 @@ def add_resource():
         validate_resource(resource)
     except ValidationFailed as error:
         abort(422, str(error))
+    _id = add_request["data"].get("id", get_id())
     link = get_location_url(_id)
     resources[_id] = resource
     response.headers["Location"] = link

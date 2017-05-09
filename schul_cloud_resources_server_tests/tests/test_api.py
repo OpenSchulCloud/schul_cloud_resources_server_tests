@@ -398,8 +398,8 @@ class TestPostWithId:
         ])
     def test_a_present_id_is_accepted(self, api, valid_resource, _id):
         """If an id is given for the object, it should be used to store the object."""
-        response = api.add_resource(resource_dict(valid_resource, id=id))
-        assert response.data.id == id
+        response = api.add_resource(resource_dict(valid_resource, id=_id))
+        assert response.data.id == _id
 
     @step
     def test_a_present_id_is_reachable(self, api, valid_resource):
