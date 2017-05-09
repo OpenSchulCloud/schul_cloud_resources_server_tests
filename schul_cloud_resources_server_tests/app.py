@@ -129,9 +129,12 @@ def add_resource():
     test_jsonapi_header()
     _id = get_id()
     resources = get_resources()
-    data = touni(request.body.read())
-    pprint(data)
-    add_request = json.loads(data)
+    try:
+        data = touni(request.body.read())
+        pprint(data)
+        add_request = json.loads(data)
+    except (ValueError):
+        abort(400, "The expected content should be json, encoded in utf8.")
     resource = add_request["data"]
     link = get_location_url(_id)
     resources[_id] = resource

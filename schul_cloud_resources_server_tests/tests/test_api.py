@@ -4,6 +4,9 @@ from schul_cloud_resources_server_tests.tests.assertions import *
 from schul_cloud_resources_api_v1.rest import ApiException
 
 
+API_CONTENT_TYPE = "application/vnd.api+json"
+
+
 @step
 def test_server_is_reachable(url):
     """There is a server behind the url."""
@@ -64,20 +67,20 @@ class TestAddResource:
         see http://jsonapi.org/format/#crud-creating
         """
         response = user1.post(url + "/resources",
-                              headers={"Content-Type": "application/vnd.api+json"},
+                              headers={"Content-Type": API_CONTENT_TYPE},
                               json={"data":valid_resource})
         assert response.headers["Location"] == response.json()["links"]["self"]
 
 
     @step
-    @mark.parametrize("accept_header", ["*/*", "application/*", "application/vnd.api+json"])
+    @mark.parametrize("accept_header", ["*/*", "application/*", API_CONTENT_TYPE])
     def test_different_accept_headers(self, user1, valid_resource, url, accept_header):
-        """Test that the accept header is one of "*/*", "application/*", "application/vnd.api+json".
+        """Test that the accept header is one of "*/*", "application/*", API_CONTENT_TYPE.
 
         see https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html
         """
         response = user1.post(url + "/resources",
-                              headers={"Content-Type": "application/vnd.api+json",
+                              headers={"Content-Type": API_CONTENT_TYPE,
                                        "Accept": accept_header},
                               json={"data":valid_resource})
         assert response.status_code == 201
@@ -92,7 +95,7 @@ class TestAddResource:
         Additionally, use a different host header.
         """
         headers = ({"Host": host} if host else {})
-        headers["Content-Type"] = "application/vnd.api+json"
+        headers["Content-Type"] = API_CONTENT_TYPE
         response = user1.post(url + "/resources", headers=headers, json={"data":valid_resource})
         location = response.headers["Location"].split("//", 1)[1]
         assert location.startswith(host)
@@ -292,14 +295,14 @@ class TestInvalidRequests:
         """
 
         INVALID_MEDIA_TYPES = [ # Content-Type, Accept
-                ("", "application/vnd.api+json"),
-                ("application/json", "application/vnd.api+json"), 
-                ("application/vnd.api+json; version=1", "application/vnd.api+json"),
-                ("application/vnd.api+json", ""),
-                ("application/vnd.api+json", "application/json"),
-                ("application/vnd.api+json", "application/vnd.api+json; version=1"),
-                ("application/vnd.api+json", "*/*; version=1"),
-                ("application/vnd.api+json", "application/*; version=1"),
+                ("", API_CONTENT_TYPE),
+                ("application/json", API_CONTENT_TYPE), 
+                ("application/vnd.api+json; version=1", API_CONTENT_TYPE),
+                (API_CONTENT_TYPE, ""),
+                (API_CONTENT_TYPE, "application/json"),
+                (API_CONTENT_TYPE, "application/vnd.api+json; version=1"),
+                (API_CONTENT_TYPE, "*/*; version=1"),
+                (API_CONTENT_TYPE, "application/*; version=1"),
             ]
 
         @fixture(params=INVALID_MEDIA_TYPES)
@@ -320,10 +323,20 @@ class TestInvalidRequests:
         def test_invalid_content_type_header_has_the_right_content_type(
                 self, response_to_invalid_content_type):
             """Send possible requests to the server and set no header."""
-            assert response_to_invalid_content_type.headers["Content-Type"] == "application/vnd.api+json"
+            assert response_to_invalid_content_type.headers["Content-Type"] == API_CONTENT_TYPE
 
-        # TODO: test invalid Accept header
-        # TODO: test valid accept headers  */* application/* and application/vnd.api+json
+    @step
+    @mark.parametrize("data", ["invalid json", b"\x00\xfeas\x44"])
+    def test_bad_request_if_there_is_no_valid_json(self, url, data):
+        """If the posted object is not a valid JSON, the server notices it.
+
+        https://httpstatuses.com/400
+        """
+        response = requests.post(url + "/resources", data=data, 
+                                 headers={"Content-Type": API_CONTENT_TYPE})
+        assert response.status_code == 400
+
+
     # TODO: test absent data attribute
     # TODO: Test invalid json schema
     #        invalid json
