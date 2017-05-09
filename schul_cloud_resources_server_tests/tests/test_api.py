@@ -335,12 +335,45 @@ class TestInvalidRequests:
         response = requests.post(url + "/resources", data=data, 
                                  headers={"Content-Type": API_CONTENT_TYPE})
         assert response.status_code == 400
+    
+    @step
+    def test_invalid_resources_can_not_be_posted(self, api, invalid_resource):
+        """If the resources do not fit in the schema, they cannot be posted.
+
+        The error code 422 should be returned.
+        https://httpstatuses.com/422
+        """
+        with raises(ApiException) as error:
+            api.add_resource({"data": invalid_resource})
+        assert error.value.status == 422
+
+    @step
+    def test_invalid_resources_is_an_error(self, user1, invalid_resource, url):
+        """If the resources do not fit in the schema, they cannot be posted.
+
+        The error code 422 should be returned.
+        https://httpstatuses.com/422
+        """
+        response = user1.post(url + "/resources", json={"data": invalid_resource},
+                              headers={"Content-Type": API_CONTENT_TYPE})
+        assertIsError(response, 422)
+
+    @step
+    @mark.parametrize("document", [{"data": {}, "errors":[]}, {}])
+    def test_absent_data_attribute(self, user1, a_valid_resource, url, document):
+        """The document must contain the data atribute.
+
+        http://jsonapi.org/format/#document-top-level
+        """
+        if "data" in document:
+            document["data"] = a_valid_resource
+        response = user1.post(url + "/resources", json=document,
+                              headers={"Content-Type": API_CONTENT_TYPE})
+        assertIsError(response, 422)
 
 
     # TODO: test absent data attribute
-    # TODO: Test invalid json schema
-    #        invalid json
-
+    # TODO: test presence of id
 
 
 

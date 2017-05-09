@@ -42,7 +42,7 @@ def _error(error, code):
     response.headers["Content-Type"] = "application/vnd.api+json"
     return response_object(errors=[_error])
 
-for code in [404, 415]:
+for code in [404, 415, 422]:
     error(code)(lambda error, code=code:_error(error, code))
 
 
@@ -135,7 +135,15 @@ def add_resource():
         add_request = json.loads(data)
     except (ValueError):
         abort(400, "The expected content should be json, encoded in utf8.")
+    if not "data" in add_request:
+        abort(422, "The data attribute must be pressent.")
+    if "errors" in add_request:
+        abort(422, "The errors attribute must not be pressent.")
     resource = add_request["data"]
+    try:
+        validate_resource(resource)
+    except ValidationFailed as error:
+        abort(422, str(error))
     link = get_location_url(_id)
     resources[_id] = resource
     response.headers["Location"] = link

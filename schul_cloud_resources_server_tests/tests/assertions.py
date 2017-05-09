@@ -12,10 +12,13 @@ def to_dict(model):
     """Return a dictionary."""
     if hasattr(model, "to_dict"):
         return model.to_dict()
-    if hasattr(model, "json"):
-        return model.json()
-    if isinstance(model, str):
-        return json.loads(model)
+    try:
+        if hasattr(model, "json"):
+            return model.json()
+        if isinstance(model, STRING_TYPE):
+            return json.loads(model)
+    except ValueError as error:
+        raise ValueError("The response should be JSON. {}".format(error))
     assert isinstance(model, dict)
     return model
 
