@@ -382,6 +382,9 @@ class TestInvalidRequests:
                               headers={"Content-Type": API_CONTENT_TYPE})
         assertIsError(response, 422)
 
+if sys.version_info[0] == 3:
+    unichr = chr
+
 
 class TestPostWithId:
     """The client can request to store an object with a given id."""
@@ -424,7 +427,7 @@ class TestPostWithId:
     @step
     @mark.parametrize("invalid_id", [
             1, "asd\x00", "%", "%1", "%Ga", "jsdlfhasdjlkfkjdsalkf\\", "ids",
-        ] + [chr(i) for i in range(256) if chr(i) not in '!*"\'(),+abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$_@.&+-'])
+        ] + [unichr(i) for i in range(256) if unichr(i) not in u'!*"\'(),+abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$_@.&+-'])
     def test_invalid_ids(self, a_user, invalid_id, a_valid_resource):
         """Test what happens with invalid ids."""
         with raises(ApiException) as error:
