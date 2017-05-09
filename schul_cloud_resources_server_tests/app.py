@@ -136,10 +136,14 @@ def add_resource():
     except (ValueError):
         abort(400, "The expected content should be json, encoded in utf8.")
     if not "data" in add_request:
-        abort(422, "The data attribute must be pressent.")
+        abort(422, "The data property must be present.")
     if "errors" in add_request:
-        abort(422, "The errors attribute must not be pressent.")
-    resource = add_request["data"]
+        abort(422, "The errors property must not be present.")
+    if add_request["data"].get("type") != "resource":
+        abort(422, "There must be a \"type\" property set to \"resource\" in the data field.")
+    if not isinstance(add_request["data"].get("attributes"), dict):
+        abort(422, "There must be a \"attributes\" property set to an object in the data field.")
+    resource = add_request["data"]["attributes"]
     try:
         validate_resource(resource)
     except ValidationFailed as error:

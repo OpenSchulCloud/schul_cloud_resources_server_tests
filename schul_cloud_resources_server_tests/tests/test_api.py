@@ -1,10 +1,16 @@
 import requests
-from pytest import fixture, mark, raises
+from pytest import fixture, mark, raises, skip
 from schul_cloud_resources_server_tests.tests.assertions import *
 from schul_cloud_resources_api_v1.rest import ApiException
 
 
 API_CONTENT_TYPE = "application/vnd.api+json"
+
+
+def resource_dict(resource, **kw):
+    kw.setdefault("attributes", resource)
+    kw.setdefault("type", "resource")
+    return {"data": kw}
 
 
 @step
@@ -32,14 +38,12 @@ class TestAddResource:
     - response
     - links
     - location header
-    - missing data TODO
-    - additional id - whether it is taken TODO
     """
 
     @fixture
     def add_resource_response(self, api, valid_resource):
         """Post a resource and get the response."""
-        return api.add_resource({"data": valid_resource})
+        return api.add_resource(resource_dict(valid_resource))
 
     @step
     def test_get_resource_back(self, add_resource_response, valid_resource):
@@ -68,7 +72,7 @@ class TestAddResource:
         """
         response = user1.post(url + "/resources",
                               headers={"Content-Type": API_CONTENT_TYPE},
-                              json={"data":valid_resource})
+                              json=resource_dict(valid_resource))
         assert response.headers["Location"] == response.json()["links"]["self"]
 
 
@@ -82,7 +86,7 @@ class TestAddResource:
         response = user1.post(url + "/resources",
                               headers={"Content-Type": API_CONTENT_TYPE,
                                        "Accept": accept_header},
-                              json={"data":valid_resource})
+                              json=resource_dict(valid_resource))
         assert response.status_code == 201
         
 
@@ -96,7 +100,7 @@ class TestAddResource:
         """
         headers = ({"Host": host} if host else {})
         headers["Content-Type"] = API_CONTENT_TYPE
-        response = user1.post(url + "/resources", headers=headers, json={"data":valid_resource})
+        response = user1.post(url + "/resources", headers=headers, json=resource_dict(valid_resource))
         location = response.headers["Location"].split("//", 1)[1]
         assert location.startswith(host)
         assert response.headers["Location"] == response.json()["links"]["self"]
@@ -121,7 +125,7 @@ class TestGetResources:
     @step
     def test_add_a_resource_and_retrieve_it(self, api, valid_resource):
         """When we save a resource, we should be able to get it back."""
-        result = api.add_resource({"data": valid_resource})
+        result = api.add_resource(resource_dict(valid_resource))
         _id = result.data.id
         assert _id, "id should be in {}".format(result.to_dict())
         copy = api.get_resource(_id).data.attributes
@@ -130,21 +134,21 @@ class TestGetResources:
     @step
     def test_ressource_id_is_there(self, api, valid_resource):
         """When a resource is retrieved, the id is sent with it."""
-        result = api.add_resource({"data": valid_resource})
+        result = api.add_resource(resource_dict(valid_resource))
         server_copy = api.get_resource(result.data.id)
         assert result.data.id == server_copy.data.id
 
     @step
     def test_ressource_type_is_set(self, api, valid_resource):
         """When a resource is retrieved, the type is sent with it."""
-        result = api.add_resource({"data": valid_resource})
+        result = api.add_resource(resource_dict(valid_resource))
         server_copy = api.get_resource(result.data.id)
         assert server_copy.data.type == "resource"
 
     @step
     def test_ressource_is_a_response(self, api, valid_resource):
         """When a resource is retrieved, the type is sent with it."""
-        result = api.add_resource({"data": valid_resource})
+        result = api.add_resource(resource_dict(valid_resource))
         server_copy = api.get_resource(result.data.id)
         assertIsResponse(server_copy)
 
@@ -159,9 +163,9 @@ def test_there_are_at_least_two_valid_resources(valid_resources):
 @step
 def test_add_two_different_resources(api, valid_resources):
     """When we post two different resources, we want the server to distinct them."""
-    r1 = api.add_resource({"data":valid_resources[0]})
+    r1 = api.add_resource(resource_dict(valid_resources[0]))
     c1_1 = api.get_resource(r1.data.id).data.attributes
-    r2 = api.add_resource({"data":valid_resources[1]})
+    r2 = api.add_resource(resource_dict(valid_resources[1]))
     c2_1 = api.get_resource(r2.data.id).data.attributes
     c1_2 = api.get_resource(r1.data.id).data.attributes
     c2_2 = api.get_resource(r2.data.id).data.attributes
@@ -179,7 +183,7 @@ class TestDeleteResource:
     @fixture(params=["get_resource", "delete_resource"])
     def get_error(self, api, valid_resource, request):
         """Return an error that is created if a ressource is absent."""
-        r1 = api.add_resource({"data": valid_resource})
+        r1 = api.add_resource(resource_dict(valid_resource))
         api.delete_resource(r1.data.id)
         action = getattr(api, request.param)
         with raises(ApiException) as error:
@@ -230,7 +234,7 @@ class TestListResources:
     def test_new_resources_are_listed(self, api, valid_resource):
         """Posting new resources adds them their ids to the list of ids."""
         ids_before = set(_id.id for _id in api.get_resource_ids().data)
-        r1 = api.add_resource({"data": valid_resource})
+        r1 = api.add_resource(resource_dict(valid_resource))
         ids_after = set(_id.id for _id in api.get_resource_ids().data)
         new_ids = ids_after - ids_before
         assert r1.data.id in new_ids
@@ -252,7 +256,7 @@ class TestDeleteAllResources:
     def test_delete_all_resources_removes_resource(self, api, action, add, valid_resource):
         """After all resources are deleted, they can not be accessed any more."""
         if add:
-            ids = [api.add_resource({"data": valid_resource}).data]
+            ids = [api.add_resource(resource_dict(valid_resource)).data]
         else:
             ids = api.get_resource_ids().data
         api.delete_resources()
@@ -310,7 +314,7 @@ class TestInvalidRequests:
             return requests.post(url + "/resources",
                                  headers={"Content-Type": request.param[0],
                                           "Accept": request.param[1]},
-                                 data=json.dumps({"data":a_valid_resource}))
+                                 data=json.dumps(resource_dict(a_valid_resource)))
 
         @step
         def test_invalid_content_type_header_is_an_error(
@@ -344,7 +348,7 @@ class TestInvalidRequests:
         https://httpstatuses.com/422
         """
         with raises(ApiException) as error:
-            api.add_resource({"data": invalid_resource})
+            api.add_resource(resource_dict(invalid_resource))
         assert error.value.status == 422
 
     @step
@@ -354,27 +358,80 @@ class TestInvalidRequests:
         The error code 422 should be returned.
         https://httpstatuses.com/422
         """
-        response = user1.post(url + "/resources", json={"data": invalid_resource},
+        response = user1.post(url + "/resources", json=resource_dict(invalid_resource),
                               headers={"Content-Type": API_CONTENT_TYPE})
         assertIsError(response, 422)
 
     @step
-    @mark.parametrize("document", [{"data": {}, "errors":[]}, {}])
-    def test_absent_data_attribute(self, user1, a_valid_resource, url, document):
-        """The document must contain the data atribute.
+    @mark.parametrize("document", [
+            {},                               # nothing
+            {"data": {}, "errors":[]},        # errors present
+            {"errors":[]},                    # errors present
+            {"data": {"type": "resource"}},   # no attributes
+            {"data": {"type": "resrce", "attributes": {}}},      # invalid type
+            {"data": {}},                     # no type
+            {"data": {"attributes": {}}},     # no type
+            {"data": {"attributes": [], "type": "resource"}},    # invalid data
+            {"data": {"attributes": None, "type": "resource"}},  # invalid data
+        ])
+    def test_invalid_properties(self, user1, a_valid_resource, url, document):
+        """The document must contain the data attribute.
 
         http://jsonapi.org/format/#document-top-level
         """
-        if "data" in document:
-            document["data"] = a_valid_resource
+        if "data" in document and isinstance(document["data"].get("attributes", None), dict):
+            document["data"]["attributes"] = a_valid_resource
         response = user1.post(url + "/resources", json=document,
                               headers={"Content-Type": API_CONTENT_TYPE})
         assertIsError(response, 422)
 
 
-    # TODO: test absent data attribute
-    # TODO: test presence of id
+class TestPostWithId:
+    """The client can request to store an object with a given id."""
 
+    @step
+    @mark.parametrize("_id", [
+            "test-id",
+            "550e8400-e29b-41d4-a716-446655440000",
+            '!*"\'(),+abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$_@.&+-',
+            "%aa%f1"
+        ])
+    def test_a_present_id_is_accepted(self, api, valid_resource, _id):
+        """If an id is given for the object, it should be used to store the object."""
+        response = api.add_resource(resource_dict(valid_resource, id=id))
+        assert response.data.id == id
+
+    @step
+    def test_a_present_id_is_reachable(self, api, valid_resource):
+        """If an id is given for the object, it should be used to store the object."""
+        response = api.add_resource(resource_dict(valid_resource, id="test"))
+        copy = api.get_resource("test")
+        assert copy.data.attributes == valid_resource
+        assert copy.data.id == "test"
+
+    @step
+    def test_can_not_post_twice_to_the_same_id(self, api, valid_resource):
+        """Posting twice is a 403.
+
+        see http://jsonapi.org/format/#crud-creating-client-ids
+        """
+        response = api.add_resource(resource_dict(valid_resource, id="id"))
+        with raises(ApiException) as error:
+            api.add_resource(resource_dict(valid_resource, id="id"))
+        assert error.value.status == 403
+        assertIsError(get_error.value.body, 403)
+
+    @step
+    @mark.parametrize("invalid_id", [
+            1, "asd\x00", "%", "%1", "%Ga",
+        ] + [chr(i) for i in range(256) if chr(i) not in '!*"\'(),+abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$_@.&+-'])
+    def test_invalid_ids(self, api, invalid_id, valid_resource):
+        """Test what happens with invalid ids."""
+        with raises(ApiException) as error:
+            api.add_resource(resource_dict(valid_resource, id=invalid_id))
+        assert error.value.status == 403
+        assertIsError(get_error.value.body, 403)
+        
 
 
 
