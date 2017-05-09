@@ -246,3 +246,15 @@ class TestDeleteAllResources:
         """The status code should be 204 on content"""
         response = user1.delete(url + "/resources")
         assert response.status_code == 204
+
+
+@step
+@mark.test
+def test_there_are_invalid_resources(api, invalid_resources):
+    """Ensure that the tests have invalid resources to run with.
+
+    This is a test test to ensure the testing environment works.
+    If this test fails, the following tests may now work because of this.
+    """
+    assert invalid_resources
+
