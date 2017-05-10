@@ -16,6 +16,11 @@ from bottle import request, response, tob, touni, Bottle, abort
 from pprint import pprint
 from schul_cloud_resources_server_tests.errors import errors
 
+if sys.version_info[0] == 2:
+    STR_TYPE = basestring
+else:
+    STR_TYPE = str
+
 
 app = Bottle()
 
@@ -183,7 +188,7 @@ def add_resource():
     except ValidationFailed as error:
         abort(422, str(error))
     _id = add_request["data"].get("id", get_id())
-    if not isinstance(_id, str) or not re.match("^([!*\"'(),+a-zA-Z0-9$_@.&+-]|%[0-9a-fA-F]{2})+$", _id):
+    if not isinstance(_id, STR_TYPE) or not re.match("^([!*\"'(),+a-zA-Z0-9$_@.&+-]|%[0-9a-fA-F]{2})+$", _id):
         abort(403, "The id {} is invalid, can not be part of a url.".format(repr(_id)))
     if _id in resources or _id == "ids":
         abort(403, "The id \"{}\" already exists.".format(_id))
