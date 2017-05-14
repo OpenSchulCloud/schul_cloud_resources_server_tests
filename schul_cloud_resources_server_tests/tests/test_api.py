@@ -426,7 +426,7 @@ class TestPostWithId:
 
     @step
     @mark.parametrize("invalid_id", [
-            1, "asd\x00", "%", "%1", "%Ga", "jsdlfhasdjlkfkjdsalkf\\", "ids",
+            1, "asd\x00", "%", "%1", "%Ga", "%11", "%aa", "%AF", "jsdlfhasdjlkfkjdsalkf\\", "ids",
         ] + [unichr(i) for i in range(256) if unichr(i) not in u'!*"\'(),+abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$_@.&+-'])
     def test_invalid_ids(self, a_user, invalid_id, a_valid_resource):
         """Test what happens with invalid ids."""
@@ -434,14 +434,13 @@ class TestPostWithId:
             a_user.api.add_resource(resource_dict(a_valid_resource, id=invalid_id))
         assert error.value.status == 403
         assertIsError(error.value.body, 403)
-        
+
 
 class TestIdCreationByDatabase:
     """Test the ids which are created by the database.
 
     Exclude that ids are doubled.
     """
-
 
     @step
     def deleting_and_adding_a_resource_creates_a_new_id(self, api, valid_ressorce):
