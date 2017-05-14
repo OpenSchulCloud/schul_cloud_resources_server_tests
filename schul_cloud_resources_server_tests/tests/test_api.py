@@ -394,7 +394,6 @@ class TestPostWithId:
             "test-id",
             "550e8400-e29b-41d4-a716-446655440000",
             '!*"\'(),+abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$_@.&+-',
-            "%aa%f1"
         ])
     def test_a_present_id_is_accepted(self, api, valid_resource, _id):
         """If an id is given for the object, it should be used to store the object."""
