@@ -152,6 +152,11 @@ You can view the `output
 The configuration is generic.
 It will run under any other language you configure.
 
+Usage in Crawler
+----------------
+
+The `url-crawler <https://github.com/schul-cloud/url-crawler#readme>`__ uses the test server to test synchronization.
+
 Use the server in pytest
 ------------------------
 
@@ -173,20 +178,6 @@ The following attributes are available:
 
 For more information, see the module ``schul_cloud_resources_server_tests.tests.fixtures``.
 You can add support for more test frameworks.
-
-
-TODO
-----
-
-- generate a docker container for the server
-- generate a docker container for the tests
-- document how to embed the tests and the server in 
-
-  - a crawler
-  - travis build script of arbitrary language
-- create example crawler with tests
-
-
 
 
 .. _API: https://github.com/schul-cloud/resources-api-v1
