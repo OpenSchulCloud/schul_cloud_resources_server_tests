@@ -9,7 +9,7 @@ def test_server_is_there(resources_server):
 
 def test_server_works_on_data(resources_server, valid_resource):
     """Test that the api adds a resource."""
-    resources_server.api.add_resource(valid_resource)
+    resources_server.api.add_resource({"data": {"type": "resource", "attributes": valid_resource}})
     assert resources_server.get_resources() == [valid_resource]
 
 
