@@ -1,3 +1,8 @@
+"""This module contains assertions which work across many tests.
+
+These assertions are a bit more complex than an assert ==.
+"""
+
 import json
 from schul_cloud_resources_server_tests.errors import errors as server_errors
 import sys
@@ -30,9 +35,11 @@ def assertIsResponse(response, link_self="TODO"):
     assert "jsonapi" in response, "jsonapi must be present, see the api specification."
     jsonapi = response.get("jsonapi")
     assert jsonapi, "the jsonapi attribute must be set in the reponse"
+    assert jsonapi.get("version") == "1.0", "version must be present http://jsonapi.org/format/#document-jsonapi-object"
+    assert "meta" in jsonapi, "meta tag should be present to contain some information."
     for attr in ["name", "source", "description"]:
-        assert attr in jsonapi, "{} must be present, see #/definition/Jsonapi".format(attr)
-        assert isinstance(attr, STRING_TYPE)
+        assert attr in jsonapi["meta"], "{} must be present, see #/definition/Jsonapi".format(attr)
+        assert isinstance(jsonapi["meta"][attr], STRING_TYPE)
     if link_self is not None:
        assert link_self != "TODO", "Change the test case source code to include the url."
        assert "links" in response
