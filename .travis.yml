@@ -19,12 +19,12 @@ install:
 
 script:
 # test repository
-- scripts/test.sh
+- scripts/test-all.sh
 # test installation
 - python setup.py sdist bdist_wheel
 - pip install dist/*.whl
 - sleep 3 # forces reload of server and restart
-- ( mkdir abc; cd abc ; ../scripts/test.sh )
+- ( mkdir abc; cd abc ; ../scripts/test-module.sh )
 
 before_deploy:
 - scripts/create_pypi_login_for_travis.sh
