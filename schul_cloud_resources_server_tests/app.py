@@ -140,10 +140,12 @@ def get_location_url(resource_id):
 
 def response_object(cnf={}, **kw):
     kw.update(cnf)
-    kw["jsonapi"] = dict(
-        name="schul_cloud_resources_server_tests.app",
-        source="https://gitub.com/schul-cloud/schul_cloud_resources_server_tests",
-        description="A test server to test crawlers agains the resources api.")
+    kw["jsonapi"] = {
+        "version": "1.0",
+        "meta": {
+        "name": "schul_cloud_resources_server_tests.app",
+        "source": "https://gitub.com/schul-cloud/schul_cloud_resources_server_tests",
+        "description": "A test server to test crawlers agains the resources api."}}
     return json.dumps(kw)
 
 def test_jsonapi_header():
