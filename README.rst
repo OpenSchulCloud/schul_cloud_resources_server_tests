@@ -9,7 +9,7 @@ Schul-Cloud Resources Server Tests
    :target: https://pypi.python.org/pypi/schul-cloud-resources-server-tests
    :alt: Python Package Index
 
-.. image:: https://img.shields.io/docker/build/schul-cloud/schul_cloud_resources_server_tests.svg
+.. image:: https://img.shields.io/docker/build/schulcloud/schul_cloud_resources_server_tests.svg
    :target: https://hub.docker.com/r/schulcloud/schul_cloud_resources_server_tests/builds/
    :alt: Dockerhub Automated Build Status
 
