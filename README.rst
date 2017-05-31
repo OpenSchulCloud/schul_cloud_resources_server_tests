@@ -23,7 +23,7 @@ Using `pip`, you can install all dependencies like this:
 
 .. code:: shell
 
-    pip install schul_cloud_resources_server_tests
+    pip install --user schul_cloud_resources_server_tests
 
 When you are done, you can import the package.
 
