@@ -78,7 +78,7 @@ def get_id():
     """Return a new id."""
     global last_id
     last_id += 1
-    return  str(last_id)
+    return str(last_id)
 
 data.delete_resources()
 
@@ -132,10 +132,14 @@ def get_resources():
     return _resources[username]
 
 
+def get_endpoint_url():
+    """Return the url that this server is reachable at."""
+    return "http://" + request.headers["Host"] + BASE
+
 
 def get_location_url(resource_id):
     """Return the location orl of a resource given by id."""
-    return "http://" + request.headers["Host"] + BASE + "/resources/{}".format(resource_id)
+    return get_endpoint_url() + "/resources/{}".format(resource_id)
 
 
 def response_object(cnf={}, **kw):
@@ -146,7 +150,7 @@ def response_object(cnf={}, **kw):
         "name": "schul_cloud_resources_server_tests.app",
         "source": "https://gitub.com/schul-cloud/schul_cloud_resources_server_tests",
         "description": "A test server to test crawlers agains the resources api."}}
-    return json.dumps(kw)
+    return json.dumps(kw, indent=2) + "\r\n"
 
 def test_jsonapi_header():
     """Make sure that the content type is set accordingly.
@@ -238,6 +242,58 @@ def delete_resources():
     resources = get_resources()
     resources.clear()
     response.status = 204
+
+
+@get("/")
+def get_help_page():
+    """Display a help page for the users."""
+    return """
+    <html>
+      <body>
+        <h1>Resources Test Server</h1>
+        <p>
+          Welcome to the resources test server.
+          The server endpoint runs at <a href="{url}">{url}</a>.
+          You can view the endpoint specification here:
+          <ul>
+            <li><a href="https://app.swaggerhub.com/apis/niccokunzmann/schul-cloud-content-api/1.0.0">Swaggerhub</a></li>
+            <li><a href="https://github.com/schul-cloud/resources-api-v1#resources-api">Resources API definition</a></li>
+          </ul>
+        </p>
+        <h2>Endpoints</h2>
+        <p>
+          The following endpoints can be reached:
+          <ul>
+            <li>
+              GET {url}/resources/ids<br/>
+              To get all resource ids. Command:
+              <pre>curl -X GET "{url}/resources/ids" -H  "accept: application/vnd.api+json"</pre>
+            </li>
+            <li>
+              POST {url}/resources<br/>
+              To add a new resource. Command:
+              <pre>curl -X POST "{url}/resources" -H  "accept: application/vnd.api+json" -H  "content-type: application/vnd.api+json" -d "{{  \\"data\\": {{    \\"type\\": \\"resource\\",    \\"attributes\\": {{      \\"title\\": \\"Example Website\\",      \\"url\\": \\"https://example.org\\",      \\"licenses\\": [],      \\"mimeType\\": \\"text/html\\",      \\"contentCategory\\": \\"l\\",      \\"languages\\": [        \\"en-en\\"      ],      \\"thumbnail\\": \\"http://cache.schul-cloud.org/thumbs/k32164876328764872384.jpg\\"    }},    \\"id\\": \\"cornelsen-physics-1\\"  }}}}"</pre>
+            </li>
+            <li>
+              DELETE {url}/resources<br/>
+              To remove all saved resources. Command:
+              <pre>curl -X DELETE "{url}/resources" -H  "accept: application/vnd.api+json"</pre>
+            </li>
+            <li>
+              GET {url}/resources/{{resourceId}}<br/>
+              To get a specific resource. Command:
+              <pre>curl -X GET "{url}/resources/cornelsen-physics-1" -H  "accept: application/vnd.api+json"</pre>
+            </li>
+            <li>
+              DELETE {url}/resources/{{resourceId}}<br/>
+              To delete a specific resource. Command:
+              <pre>curl -X DELETE "{url}/resources/cornelsen-physics-1" -H  "accept: application/vnd.api+json"</pre>
+            </li>
+          </ul>
+        </p>
+      </body>
+    </html>
+    """.format(url=get_endpoint_url())
 
 
 def main():
