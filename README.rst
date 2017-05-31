@@ -196,5 +196,11 @@ Or you can pull the docker container and run it.
 
 This starts the server at the port 8080 as in the examples above.
 
+Docker-Compose
+~~~~~~~~~~~~~~
+
+There is a ``docker-compose.yml`` file, so you can use the ``docker-compose`` command.
+The server will be available at http://localhost:80/v1
+It uses a memory limit of 60MB.
 
 .. _API: https://github.com/schul-cloud/resources-api-v1
