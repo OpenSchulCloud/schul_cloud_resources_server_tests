@@ -9,12 +9,18 @@ Schul-Cloud Resources Server Tests
    :target: https://pypi.python.org/pypi/schul-cloud-resources-server-tests
    :alt: Python Package Index
 
+.. image:: https://img.shields.io/docker/build/schul-cloud/schul_cloud_resources_server_tests.svg
+   :target: https://hub.docker.com/r/schulcloud/schul_cloud_resources_server_tests/builds/
+   :alt: Dockerhub Automated Build Status
+
 This repository contains
 
 - a server to test scrapers against
 - tests to test the server
 
 The package works under Python 2 and 3.
+
+You can view the live docker instance at http://scrst.quelltext.eu/
 
 Installation
 ------------
