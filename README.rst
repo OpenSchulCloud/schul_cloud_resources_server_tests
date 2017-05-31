@@ -179,5 +179,22 @@ The following attributes are available:
 For more information, see the module ``schul_cloud_resources_server_tests.tests.fixtures``.
 You can add support for more test frameworks.
 
+Docker
+------
+
+You can build the this image with the following docker command:
+
+.. code:: shell
+
+    docker build -t schulcloud/schul_cloud_resources_server_tests .
+
+Or you can pull the docker container and run it.
+
+.. code:: shell
+
+    docker run schulcloud/schul_cloud_resources_server_tests
+
+This starts the server at the port 8080 as in the examples above.
+
 
 .. _API: https://github.com/schul-cloud/resources-api-v1
