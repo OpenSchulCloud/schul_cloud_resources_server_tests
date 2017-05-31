@@ -245,6 +245,7 @@ def delete_resources():
 
 
 @get("/")
+@get("/v1")
 def get_help_page():
     """Display a help page for the users."""
     return """
