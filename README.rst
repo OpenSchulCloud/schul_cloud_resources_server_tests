@@ -25,7 +25,7 @@ You can view the live docker instance at http://scrst.quelltext.eu/
 Installation
 ------------
 
-Using `pip`, you can install all dependencies like this:
+Using ``pip``, you can install all dependencies like this:
 
 .. code:: shell
 
@@ -36,6 +36,28 @@ When you are done, you can import the package.
 .. code:: Python
 
     import schul_cloud_resources_server_tests
+    
+Installation for Development
+----------------------------
+
+If you want to work on the module, you need to install it differently.
+If you set it up for development, you can add new tests and features.
+
+First, you need to have git installed. Then, clone the repository:
+
+.. code:: shell
+
+    git clone https://github.com/schul-cloud/schul_cloud_resources_server_tests.git
+    cd schul_cloud_resources_server_tests
+
+If you have ``pip`` installed, you can not install the packages:
+
+.. code:: shell
+
+    pip install --user -r requirements.txt
+
+Now, as long as you are in the ``schul_cloud_resources_server_tests`` folder, you can run the commands as mentioned below.
+Additionally, you can use git to create pull-requests with your edited code.
 
 Usage
 -----
