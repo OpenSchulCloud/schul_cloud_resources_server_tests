@@ -292,6 +292,13 @@ def get_help_page():
             </li>
           </ul>
         </p>
+        <p>
+            Source code for this resources test server can be found
+             <a href="https://github.com/schul-cloud/schul_cloud_resources_server_tests">
+                here
+             </a>
+            and the issues can be discussed and problems can be written down.
+        </p>
       </body>
     </html>
     """.format(url=get_endpoint_url())
