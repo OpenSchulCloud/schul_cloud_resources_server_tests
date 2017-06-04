@@ -13,6 +13,10 @@ Schul-Cloud Resources Server Tests
    :target: https://hub.docker.com/r/schulcloud/schul_cloud_resources_server_tests/builds/
    :alt: Dockerhub Automated Build Status
 
+.. image:: http://firsttimers.quelltext.eu/repository/schul-cloud/schul_cloud_resources_server_tests.svg
+   :target: http://firsttimers.quelltext.eu/repository/schul-cloud/schul_cloud_resources_server_tests.html
+   :alt: First Timers
+
 This repository contains
 
 - a server to test scrapers against
