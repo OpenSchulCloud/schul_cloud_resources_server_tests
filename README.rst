@@ -54,7 +54,7 @@ First, you need to have git installed. Then, clone the repository:
     git clone https://github.com/schul-cloud/schul_cloud_resources_server_tests.git
     cd schul_cloud_resources_server_tests
 
-If you have ``pip`` installed, you can not install the packages:
+If you have ``pip`` installed, you can now install the packages:
 
 .. code:: shell
 
