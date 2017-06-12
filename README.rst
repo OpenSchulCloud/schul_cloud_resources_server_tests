@@ -58,7 +58,7 @@ If you have ``pip`` installed, you can now install the packages:
 
 .. code:: shell
 
-    pip install --user -r requirements.txt
+    pip install --user -r requirements.txt pip-tools==1.6.5
 
 Now, as long as you are in the ``schul_cloud_resources_server_tests`` folder, you can run the commands as mentioned below.
 Additionally, you can use git to create pull-requests with your edited code.
