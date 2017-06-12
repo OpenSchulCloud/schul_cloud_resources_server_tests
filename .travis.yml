@@ -12,10 +12,8 @@ env:
   - PYPI_USER=niccokunzmann2
 
 install:
-- pip install -r requirements.txt
+- pip install -r requirements.txt twine wheel
 - python -m schul_cloud_resources_server_tests.app &
-- pip install twine wheel
-- sleep 3
 
 script:
 # test repository
@@ -23,7 +21,6 @@ script:
 # test installation
 - python setup.py sdist bdist_wheel
 - pip install dist/*.whl
-- sleep 3 # forces reload of server and restart
 - ( mkdir abc; cd abc ; ../scripts/test-module.sh )
 
 before_deploy:
