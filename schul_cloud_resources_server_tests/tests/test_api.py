@@ -28,6 +28,7 @@ def test_server_is_reachable(url):
             time.sleep(0.1)
         else:
             assert result.status_code, "Server is reachable under " + url
+            break
 
 @step
 @mark.test
