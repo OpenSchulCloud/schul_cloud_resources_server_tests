@@ -1,10 +1,12 @@
 import requests
+import time
 from pytest import fixture, mark, raises, skip
 from schul_cloud_resources_server_tests.tests.assertions import *
 from schul_cloud_resources_api_v1.rest import ApiException
 
 
 API_CONTENT_TYPE = "application/vnd.api+json"
+SECONDS_TO_START_SERVER = 20
 
 
 def resource_dict(resource, **kw):
@@ -16,9 +18,16 @@ def resource_dict(resource, **kw):
 @step
 def test_server_is_reachable(url):
     """There is a server behind the url."""
-    result = requests.get(url)
-    assert result.status_code
-
+    end = time.time() + SECONDS_TO_START_SERVER
+    while True:
+        try:
+            result = requests.get(url)
+        except:
+            if time.time() > end:
+                raise
+            time.sleep(0.1)
+        else:
+            assert result.status_code, "Server is reachable under " + url
 
 @step
 @mark.test
