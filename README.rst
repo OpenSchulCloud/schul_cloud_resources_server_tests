@@ -235,4 +235,10 @@ There is a ``docker-compose.yml`` file, so you can use the ``docker-compose`` co
 The server will be available at http://localhost:80/v1
 It uses a memory limit of 60MB.
 
+------------------------------
+
+You can edit this document `on Github
+<https://github.com/schul-cloud/schul_cloud_resources_server_tests/blob/master/README.rst#readme>`__
+and check it with `this editor <http://rst.ninjs.org/>`__.
+
 .. _API: https://github.com/schul-cloud/resources-api-v1
