@@ -39,7 +39,7 @@ class StoppableWSGIRefServerAdapter(ServerAdapter):
 
     def shutdown(self):
         """Stop the server."""
-        thread=threading.Thread(target=self.srv.shutdown)
+        thread=Thread(target=self.srv.shutdown)
         thread.start()
         thread.join()
 
