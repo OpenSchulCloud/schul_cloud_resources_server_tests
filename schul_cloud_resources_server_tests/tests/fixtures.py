@@ -37,11 +37,16 @@ class StoppableWSGIRefServerAdapter(ServerAdapter):
         self.srv.serve_forever()
         while not self.get_port(): time.sleep(0.001)
 
-    def shutdown(self):
-        """Stop the server."""
+    def shutdown(self, blocking=True):
+        """Stop the server.
+        
+        If blocking is True, this returns when the server is shut down.
+        If blocking is False, the server is notified to shut down.
+        """
         thread=Thread(target=self.srv.shutdown)
         thread.start()
-        thread.join()
+        if blocking:
+            thread.join()
 
     def get_port(self):
         """Return the port of the server."""
