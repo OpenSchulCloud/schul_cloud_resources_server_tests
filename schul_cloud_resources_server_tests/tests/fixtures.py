@@ -33,13 +33,20 @@ class StoppableWSGIRefServerAdapter(ServerAdapter):
                 class server_cls(server_cls):
                     address_family = socket.AF_INET6
 
-        self.srv = make_server(self.host, 0, app, server_cls, handler_cls)
+        self.srv = make_server(self.host, self.port, app, server_cls, handler_cls)
         self.srv.serve_forever()
         while not self.get_port(): time.sleep(0.001)
 
-    def shutdown(self):
-        """Stop the server."""
-        self.srv.shutdown()
+    def shutdown(self, blocking=True):
+        """Stop the server.
+        
+        If blocking is True, this returns when the server is shut down.
+        If blocking is False, the server is notified to shut down.
+        """
+        thread=Thread(target=self.srv.shutdown)
+        thread.start()
+        if blocking:
+            thread.join()
 
     def get_port(self):
         """Return the port of the server."""
@@ -54,10 +61,10 @@ class ParallelBottleServer(object):
 
     url_prefix = ""
 
-    def __init__(self, app):
+    def __init__(self, app, host="127.0.0.1", port=0):
         """Start the server with a bottle app."""
-        self._server = StoppableWSGIRefServerAdapter()
-        self._thread = Thread(target=app.run, kwargs=dict(host="127.0.0.1", server=self._server))
+        self._server = StoppableWSGIRefServerAdapter(host=host, port=port)
+        self._thread = Thread(target=app.run, kwargs=dict(server=self._server))
         self._thread.start()
         while not self._server.get_port(): time.sleep(0.0001)
 

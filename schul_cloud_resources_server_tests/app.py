@@ -112,7 +112,7 @@ def get_resources():
     If authentication failed, this aborts the execution with
     401 Unauthorized.
     """
-    pprint(dict(request.headers))
+    #pprint(dict(request.headers))
     header = request.environ.get('HTTP_AUTHORIZATION','')
     if header:
         print("Authorization:", header)
@@ -176,7 +176,7 @@ def add_resource():
     resources = get_resources()
     try:
         data = touni(request.body.read())
-        pprint(data)
+        #pprint(data)
         add_request = json.loads(data)
     except (ValueError):
         abort(400, "The expected content should be json, encoded in utf8.")
