@@ -40,7 +40,7 @@ last_id = 0
 def _error(error, code):
     """Return an error as json"""
     _error = {
-        "status": code,
+        "status": str(code),
         "title": errors[code],
         "detail": error.body
     }

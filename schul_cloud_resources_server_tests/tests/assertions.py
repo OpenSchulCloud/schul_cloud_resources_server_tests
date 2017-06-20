@@ -6,6 +6,7 @@ These assertions are a bit more complex than an assert ==.
 import json
 from schul_cloud_resources_server_tests.errors import errors as server_errors
 import sys
+from schul_cloud_resources_api_v1.schema import get_schemas
 
 if sys.version_info[0] == 2:
     STRING_TYPE = basestring
@@ -55,20 +56,10 @@ def assertIsError(response, status):
     You can view the specification here:
     - https://github.com/schul-cloud/resources-api-v1/blob/f0ce9acfde59563822071207bd176baf648db8b4/api-definition/swagger.yaml#L292
     - updated: https://github.com/schul-cloud/resources-api-v1/blob/master/api-definition/swagger.yaml#L292
+    - Error specification:
     """
     response = to_dict(response)
     assertIsResponse(response, None)
-    assert "errors" in response, "errors must be present"
-    errors = response["errors"]
-    assert isinstance(errors, list)
-    assert len(errors) >= 1
-    for error in errors:
-        for attr in ["status", "title", "detail"]:
-            assert attr in error, "#/definitions/ErrorElement"
-        assert isinstance(error["status"], int), "#/definitions/ErrorElement"
-        assert isinstance(error["title"], STRING_TYPE), "#/definitions/ErrorElement"
-        assert isinstance(error["detail"], STRING_TYPE), "#/definitions/ErrorElement"
-    error = errors[0]
-    assert error["status"] == status
-    assert error["title"] == server_errors[status]
-    assert len(error["detail"]) > len(error["title"])
+    get_schemas()["error"].validate(response)
+    error = response["errors"][0]
+    assert error["status"] == str(status)
