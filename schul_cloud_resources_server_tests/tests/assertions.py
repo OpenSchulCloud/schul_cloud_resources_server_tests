@@ -30,11 +30,11 @@ def to_dict(model):
 
 def assertIsResponse(response, link_self="TODO"):
     response = to_dict(response)
-    assert ("errors" in response) ^ ("data" in response), "The members data and errors MUST NOT coexist in the same document. http://jsonapi.org/format/#conventions"
+    assert ("errors" in response) ^ ("data" in response), "Either the member \"data\" or the member \"error\" must be given. http://jsonapi.org/format/#conventions"
     assert ("data" in response if "included" in response else True), "If a document does not contain a top-level data key, the included member MUST NOT be present either. http://jsonapi.org/format/#conventions"
     assert "jsonapi" in response, "jsonapi must be present, see the api specification."
     jsonapi = response.get("jsonapi")
-    assert jsonapi, "the jsonapi attribute must be set in the reponse"
+    assert jsonapi is not None, "the jsonapi attribute must be set in the reponse"
     assert jsonapi.get("version") == "1.0", "version must be present http://jsonapi.org/format/#document-jsonapi-object"
     assert "meta" in jsonapi, "meta tag should be present to contain some information."
     for attr in ["name", "source", "description"]:
@@ -46,7 +46,7 @@ def assertIsResponse(response, link_self="TODO"):
        assert isinstance(response["links"], dict)
        assert "self" in response["links"] or "_self" in response["links"]
        link = response["links"].get("self", response["links"].get("_self"))
-       assert link == link_self
+       assert link == link_self, link_self
 
 
 def assertIsError(response, status):
@@ -69,6 +69,6 @@ def assertIsError(response, status):
         assert isinstance(error["title"], STRING_TYPE), "#/definitions/ErrorElement"
         assert isinstance(error["detail"], STRING_TYPE), "#/definitions/ErrorElement"
     error = errors[0]
-    assert error["status"] == status
-    assert error["title"] == server_errors[status]
+    assert error["status"] == status, status
+    assert error["title"] == server_errors[status], server_errors[status]
     assert len(error["detail"]) > len(error["title"])
