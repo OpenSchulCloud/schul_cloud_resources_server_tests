@@ -40,7 +40,7 @@ def assertIsResponse(response, link_self="TODO"):
     assert "meta" in jsonapi, "meta tag should be present to contain some information."
     for attr in ["name", "source", "description"]:
         assert attr in jsonapi["meta"], "{} must be present, see #/definition/Jsonapi".format(attr)
-        assert isinstance(jsonapi["meta"][attr], STRING_TYPE)
+        assert isinstance(jsonapi["meta"][attr], STRING_TYPE), "jsonapi.meta.{} must be a string.".format(attr)
     if link_self is not None:
        assert link_self != "TODO", "Change the test case source code to include the url."
        assert "links" in response
