@@ -31,7 +31,7 @@ def to_dict(model):
 
 def assertIsResponse(response, link_self="TODO"):
     response = to_dict(response)
-    assert ("errors" in response) ^ ("data" in response), "Either the member \"data\" or the member \"error\" must be given. http://jsonapi.org/format/#conventions"
+    assert ("errors" in response) ^ ("data" in response), "Either the member \"data\" or the member \"errors\" must be given. http://jsonapi.org/format/#conventions"
     assert ("data" in response if "included" in response else True), "If a document does not contain a top-level data key, the included member MUST NOT be present either. http://jsonapi.org/format/#conventions"
     assert "jsonapi" in response, "jsonapi must be present, see the api specification."
     jsonapi = response.get("jsonapi")
