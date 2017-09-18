@@ -3,6 +3,7 @@ import time
 from pytest import fixture, mark, raises, skip
 from schul_cloud_resources_server_tests.tests.assertions import *
 from schul_cloud_resources_api_v1.rest import ApiException
+from pprint import pprint
 
 
 API_CONTENT_TYPE = "application/vnd.api+json"
@@ -53,6 +54,8 @@ class TestAddResource:
     @fixture
     def add_resource_response(self, api, valid_resource):
         """Post a resource and get the response."""
+        print("Posting resource:")
+        pprint(valid_resource)
         return api.add_resource(resource_dict(valid_resource))
 
     @step
