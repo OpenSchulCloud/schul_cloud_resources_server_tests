@@ -222,6 +222,10 @@ class User(object):
         else:
             raise ValueError(self._auth_type)
         return r
+    
+    def get_authorization_header_dict(self, headers):
+        """Set the authorization header in the headers dict."""
+        return self._get_auth_headers(headers.copy())
 
     def __repr__(self):
         """A string representation."""

@@ -7,6 +7,7 @@ import json
 from schul_cloud_resources_server_tests.errors import errors as server_errors
 import sys
 from schul_cloud_resources_api_v1.schema import get_schemas
+from pprint import pprint
 
 if sys.version_info[0] == 2:
     STRING_TYPE = basestring
@@ -59,7 +60,8 @@ def assertIsError(response, status):
     - Error specification:
     """
     response = to_dict(response)
+    pprint(("response:", response))
     assertIsResponse(response, None)
     get_schemas()["error"].validate(response)
     error = response["errors"][0]
-    assert error["status"] == str(status)
+    assert error["status"] == str(status), "{} == {}".format(repr(error["status"]), repr(str(status)))

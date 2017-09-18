@@ -309,22 +309,14 @@ class TestInvalidRequests:
         with any media type parameters.
         """
 
-        INVALID_MEDIA_TYPES = [ # Content-Type, Accept
-                ("", API_CONTENT_TYPE),
-                ("application/json", API_CONTENT_TYPE), 
-                ("application/vnd.api+json; version=1", API_CONTENT_TYPE),
-                (API_CONTENT_TYPE, ""),
-                (API_CONTENT_TYPE, "application/json"),
-                (API_CONTENT_TYPE, "application/vnd.api+json; version=1"),
-                (API_CONTENT_TYPE, "*/*; version=1"),
-                (API_CONTENT_TYPE, "application/*; version=1"),
-            ]
-
-        @fixture(params=INVALID_MEDIA_TYPES)
-        def response_to_invalid_content_type(self, request, url, a_valid_resource):
+        @fixture
+        def response_to_invalid_content_type(self, a_user, url,
+                                             a_valid_resource):
+            headers = a_user.get_authorization_header_dict(
+                       {"Content-Type": "application/vnd.api+json; version=1"})
+            pprint(("headers", headers))
             return requests.post(url + "/resources",
-                                 headers={"Content-Type": request.param[0],
-                                          "Accept": request.param[1]},
+                                 headers=headers,
                                  data=json.dumps(resource_dict(a_valid_resource)))
 
         @step
@@ -339,6 +331,43 @@ class TestInvalidRequests:
                 self, response_to_invalid_content_type):
             """Send possible requests to the server and set no header."""
             assert response_to_invalid_content_type.headers["Content-Type"] == API_CONTENT_TYPE
+
+    class TestNotAcceptable:
+        """
+        Servers MUST respond with a 406 Not Acceptable status code
+        if a request’s Accept header contains the JSON API media type
+        and all instances of that media type are modified with media type
+        parameters.
+        """
+        INVALID_ACCEPT_HEADERS = [
+            "application/vnd.api+json; v=1",
+            "application/*; v=1",
+            "application/json,application/vnd.api+json; v=1,",
+            "*/*; v=1",
+        ]
+
+        @fixture(params=INVALID_ACCEPT_HEADERS)
+        def response_to_invalid_accept(self, a_user, url, request,
+                                             a_valid_resource):
+            headers = a_user.get_authorization_header_dict(
+                       {"Accept": request.param})
+            pprint(("headers", headers))
+            return requests.post(url + "/resources",
+                                 headers=headers,
+                                 data=json.dumps(resource_dict(a_valid_resource)))
+
+        @step
+        def test_invalid_accept_header_is_an_error(
+                self, response_to_invalid_accept):
+            """Send possible requests to the server with a malformed header.
+            The error returned should be in the jsonapi format."""
+            assertIsError(response_to_invalid_accept, 406)
+
+        @step
+        def test_invalid_accept_header_has_the_right_content_type(
+                self, response_to_invalid_accept):
+            """Send possible requests to the server and set no header."""
+            assert response_to_invalid_accept.headers["Content-Type"] == API_CONTENT_TYPE
 
     @step
     @mark.parametrize("data", ["invalid json", b"\x00\xfeas\x44"])
