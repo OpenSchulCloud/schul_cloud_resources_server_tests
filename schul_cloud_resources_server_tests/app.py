@@ -48,7 +48,7 @@ def _error(error, code):
     response.headers["Content-Type"] = "application/vnd.api+json"
     return response_object(errors=[_error])
 
-for code in [401, 403, 404, 415, 422]:
+for code in [401, 403, 404, 406, 415, 422]:
     error(code)(lambda error, code=code:_error(error, code))
 
 
@@ -159,14 +159,14 @@ def test_jsonapi_header():
     """
     content_type = request.content_type
     content_type_expected = "application/vnd.api+json"
-    if content_type != content_type_expected:
+    if content_type != content_type_expected and content_type.startswith(content_type_expected):
         abort(415, "The Content-Type header must be \"{}\", not \"{}\".".format(
                    content_type_expected, content_type))
-    accept = request.headers.get("Accept", "*/*")
+    accepts = request.headers.get("Accept", "*/*").split(",")
     expected_accept = ["*/*", "application/*", "application/vnd.api+json"]
-    if accept not in expected_accept:
-        abort(415, "The Accept header must one of \"{}\", not \"{}\".".format(
-                   expected_accept, accept))
+    if not any([accept in expected_accept for accept in accepts]):
+        abort(406, "The Accept header must one of \"{}\", not \"{}\".".format(
+                       expected_accept, ",".join(accepts)))
 
 
 @post(BASE + "/resources")
