@@ -198,6 +198,7 @@ class TestDeleteResource:
         action = getattr(api, request.param)
         with raises(ApiException) as error:
             action(r1.data.id)
+        pprint(("get_error.value.body:", error.value.body))
         return error
 
     @step

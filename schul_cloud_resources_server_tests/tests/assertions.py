@@ -47,7 +47,7 @@ def assertIsResponse(response, link_self="TODO"):
        assert isinstance(response["links"], dict)
        assert "self" in response["links"] or "_self" in response["links"]
        link = response["links"].get("self", response["links"].get("_self"))
-       assert link == link_self, link_self
+       assert link == link_self, '{} == {}'.format(link, link_self)
 
 
 def assertIsError(response, status):
