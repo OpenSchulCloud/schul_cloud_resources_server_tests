@@ -461,6 +461,7 @@ class TestPostWithId:
         see http://jsonapi.org/format/#crud-creating-client-ids
         """
         api.delete_resources()
+        print("ids after delete:", api.get_resource_ids())
         response = api.add_resource(resource_dict(valid_resource, id="id"))
         with raises(ApiException) as error:
             api.add_resource(resource_dict(valid_resource, id="id"))
@@ -585,7 +586,7 @@ class TestAuthentication:
 
     @step
     @mark.parametrize("action", [
-            lambda api, res: api.add_resource(res),
+            lambda api, res: api.add_resource(resource_dict(res)),
             lambda api, res: api.get_resource_ids(),
             lambda api, res: api.delete_resource("64682437"),
             lambda api, res: api.get_resource("tralala"),
