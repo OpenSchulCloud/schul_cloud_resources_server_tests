@@ -48,7 +48,7 @@ def _error(error, code):
     response.headers["Content-Type"] = "application/vnd.api+json"
     return response_object(errors=[_error])
 
-for code in [401, 403, 404, 406, 415, 422]:
+for code in [401, 403, 404, 405, 406, 415, 422]:
     error(code)(lambda error, code=code:_error(error, code))
 
 
@@ -229,8 +229,9 @@ def delete_resource(_id):
 
 def get_resource_ids():
     """Return the list of current ids."""
+    test_jsonapi_header()
     resources = get_resources()
-    #response.content_type = 'application/vnd.api+json'
+    response.content_type = 'application/vnd.api+json'
     return response_object({"data": [{"type": "id", "id": _id} for _id in resources], 
                             "links": {"self": get_location_url("ids")}})
 

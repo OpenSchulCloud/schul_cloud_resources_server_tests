@@ -13,7 +13,7 @@ env:
 
 install:
 - pip install -r requirements.txt twine wheel
-- python -m schul_cloud_resources_server_tests.app &
+- ( python -m schul_cloud_resources_server_tests.app > /dev/null ) &
 
 script:
 # test repository

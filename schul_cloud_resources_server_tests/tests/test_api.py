@@ -316,7 +316,7 @@ class TestInvalidRequests:
                                              a_valid_resource):
             headers = {"Content-Type": "application/vnd.api+json; version=1"}
             data = json.dumps(resource_dict(a_valid_resource))
-            return a_user.get(url + "/resources", headers=headers, data=data)
+            return a_user.get(url + "/resources/ids", headers=headers, data=data)
 
         @step
         def test_invalid_content_type_header_is_an_error(
@@ -350,7 +350,7 @@ class TestInvalidRequests:
                                              a_valid_resource):
             headers = {"Accept": request.param}
             data = json.dumps(resource_dict(a_valid_resource))
-            return a_user.get(url + "/resources", headers=headers, data=data)
+            return a_user.get(url + "/resources/ids", headers=headers, data=data)
 
         @step
         def test_invalid_accept_header_is_an_error(
