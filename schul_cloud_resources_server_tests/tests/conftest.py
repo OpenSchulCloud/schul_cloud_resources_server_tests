@@ -222,10 +222,6 @@ class User(object):
         else:
             raise ValueError(self._auth_type)
         return r
-    
-    def get_authorization_header_dict(self, headers):
-        """Set the authorization header in the headers dict."""
-        return self._get_auth_headers(headers.copy())
 
     def __repr__(self):
         """A string representation."""
@@ -234,6 +230,7 @@ class User(object):
     def _add_auth_headers(self, kw):
         """Embed the authenticatin headers into to key words"""
         kw["headers"] = self._get_auth_headers(kw.get("headers", {}))
+        kw["headers"].setdefault("Accept", "application/vnd.api+json")
         return kw
 
     def get(self, url, **kw):

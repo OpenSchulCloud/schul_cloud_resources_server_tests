@@ -314,12 +314,9 @@ class TestInvalidRequests:
         @fixture
         def response_to_invalid_content_type(self, a_user, url,
                                              a_valid_resource):
-            headers = a_user.get_authorization_header_dict(
-                       {"Content-Type": "application/vnd.api+json; version=1"})
-            pprint(("headers", headers))
-            return requests.post(url + "/resources",
-                                 headers=headers,
-                                 data=json.dumps(resource_dict(a_valid_resource)))
+            headers = {"Content-Type": "application/vnd.api+json; version=1"}
+            data = json.dumps(resource_dict(a_valid_resource))
+            return a_user.get(url + "/resources", headers=headers, data=data)
 
         @step
         def test_invalid_content_type_header_is_an_error(
@@ -343,20 +340,17 @@ class TestInvalidRequests:
         """
         INVALID_ACCEPT_HEADERS = [
             "application/vnd.api+json; v=1",
-            "application/*; v=1",
+            # "application/*; v=1", # this can not be used as it is too general
             "application/json,application/vnd.api+json; v=1,",
-            "*/*; v=1",
+            # "*/*; v=1", # this can not be used as it is too general
         ]
 
         @fixture(params=INVALID_ACCEPT_HEADERS)
         def response_to_invalid_accept(self, a_user, url, request,
                                              a_valid_resource):
-            headers = a_user.get_authorization_header_dict(
-                       {"Accept": request.param})
-            pprint(("headers", headers))
-            return requests.post(url + "/resources",
-                                 headers=headers,
-                                 data=json.dumps(resource_dict(a_valid_resource)))
+            headers = {"Accept": request.param}
+            data = json.dumps(resource_dict(a_valid_resource))
+            return a_user.get(url + "/resources", headers=headers, data=data)
 
         @step
         def test_invalid_accept_header_is_an_error(
