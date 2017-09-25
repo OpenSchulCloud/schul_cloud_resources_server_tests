@@ -75,6 +75,7 @@ class TestAddResource:
         """Links are returned. The self link should point to the resource."""
         response = user1.get(add_resource_response.links.self)
         data = response.json()
+        pprint(data)
         resource = data["data"]["attributes"]
         assert resource == valid_resource
 
