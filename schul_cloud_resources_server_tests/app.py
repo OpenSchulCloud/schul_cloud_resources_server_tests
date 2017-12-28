@@ -101,7 +101,7 @@ def get_api_key():
         if method.lower() != 'api-key': return
         return touni(base64.b64decode(tob(data[4:])))
     except (ValueError, TypeError):
-        abort(401, HEADER_ERROR) 
+        abort(401, HEADER_ERROR)
 
 BASIC_ERROR = "Could not do basic authentication. Wrong username or password."
 API_KEY_ERROR = "Could not authenticate using the given api key."
@@ -215,7 +215,7 @@ def get_resource(_id):
     resource = resources.get(_id)
     if resource is None:
         abort(404, "The resource with the id \"{}\" could not be found.".format(_id))
-    return response_object({"data": {"attributes": resource, "id": _id, "type": "resource"}, 
+    return response_object({"data": {"attributes": resource, "id": _id, "type": "resource"},
                             "links": {"self": get_location_url(_id)}})
 
 
@@ -232,7 +232,7 @@ def get_resource_ids():
     test_jsonapi_header()
     resources = get_resources()
     response.content_type = 'application/vnd.api+json'
-    return response_object({"data": [{"type": "id", "id": _id} for _id in resources], 
+    return response_object({"data": [{"type": "id", "id": _id} for _id in resources],
                             "links": {"self": get_location_url("ids")}})
 
 
@@ -251,6 +251,9 @@ def get_help_page():
     """Display a help page for the users."""
     return """
     <html>
+      <head>
+       <link rel="stylesheet" type="text/css" href="stylesheet.css">
+      </head>
       <body>
         <h1>Resources Test Server</h1>
         <p>
