@@ -17,6 +17,15 @@ Schul-Cloud Resources Server Tests
    :target: http://firsttimers.quelltext.eu/repository/schul-cloud/schul_cloud_resources_server_tests.html
    :alt: First Timers
 
+This repository is a test and reference implementation for the Schul-Cloud-Resources API_.
+The purpose is to 
+
+- have a reference to verify the API_ specification is actually working
+- find uncertainties in the API_ specification
+- provide tests to speed up an implementation of the API on other servers such as `schulcloud-content <https://github.com/schul-cloud/schulcloud-content>`__
+- have people contribute tests as a means of communication between applications: one test, X server-implementations
+- have an easy-to-setup server for crawler implementations and tests
+
 This repository contains
 
 - a server to test scrapers against
