@@ -206,9 +206,9 @@ def add_resource():
             "links": {"self":link}})
 
 # call css stylesheet
-@route('schul_cloud_resources_server_tests\stylesheet.css')
+@route('stylesheet.css')
 def server_static(filepath):
-    return static_file(filepath, root="schul_cloud_resources_server_tests\tests")
+    return static_file(filepath, root="schul_cloud_resources_server_tests\stylesheet.css")
 
 
 @get(BASE + "/resources/<_id>")
@@ -252,13 +252,12 @@ def delete_resources():
 
 @get("/")
 @get("/v1")
-@route("stylesheet.css")
 def get_help_page():
     """Display a help page for the users."""
     return """
     <html>
       <head>
-       <link rel="stylesheet" type="text/css" href="schul_cloud_resources_server_tests\stylesheet.css">
+       <link rel="stylesheet" type="text/css" href="stylesheet.css">
       </head>
       <body>
         <h1>Resources Test Server</h1>

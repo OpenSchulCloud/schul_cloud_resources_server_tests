@@ -12,7 +12,7 @@ except ImportError:
     sys.path.insert(0, os.path.join(HERE, ".."))
     import schul_cloud_resources_server_tests
 from schul_cloud_resources_api_v1.schema import validate_resource, ValidationFailed
-from bottle import request, response, tob, touni, Bottle, abort, static_file, route
+from bottle import request, response, tob, touni, Bottle, abort, static_file
 from pprint import pprint
 from schul_cloud_resources_server_tests.errors import errors
 
@@ -205,10 +205,10 @@ def add_resource():
     return response_object({"data": {"attributes": resource, "type":"resource", "id": _id},
             "links": {"self":link}})
 
-# call css stylesheet
-@route('schul_cloud_resources_server_tests\stylesheet.css')
+
+@route('stylesheet.css')
 def server_static(filepath):
-    return static_file(filepath, root="schul_cloud_resources_server_tests\tests")
+    return static_file(filepath, root='stylesheet.css')
 
 
 @get(BASE + "/resources/<_id>")
@@ -252,13 +252,12 @@ def delete_resources():
 
 @get("/")
 @get("/v1")
-@route("stylesheet.css")
 def get_help_page():
     """Display a help page for the users."""
     return """
     <html>
       <head>
-       <link rel="stylesheet" type="text/css" href="schul_cloud_resources_server_tests\stylesheet.css">
+       <link rel="stylesheet" type="text/css" href="stylesheet.css">
       </head>
       <body>
         <h1>Resources Test Server</h1>
