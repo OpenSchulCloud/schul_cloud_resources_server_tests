@@ -251,6 +251,12 @@ def get_help_page():
     """Display a help page for the users."""
     return """
     <html>
+<<<<<<< HEAD
+=======
+      <head>
+       <link rel="stylesheet" type="text/css" href="stylesheet.css">
+      </head>
+>>>>>>> parent of 86b8f60... tried to call stylesheet but got error
       <body>
         <h1>Resources Test Server</h1>
         <p>
