@@ -12,7 +12,7 @@ except ImportError:
     sys.path.insert(0, os.path.join(HERE, ".."))
     import schul_cloud_resources_server_tests
 from schul_cloud_resources_api_v1.schema import validate_resource, ValidationFailed
-from bottle import request, response, tob, touni, Bottle, abort
+from bottle import request, response, tob, touni, Bottle, abort, static_file, route
 from pprint import pprint
 from schul_cloud_resources_server_tests.errors import errors
 
@@ -29,6 +29,7 @@ post = app.post
 get = app.get
 delete = app.delete
 error = app.error
+route = app.route
 
 # configuration constants
 BASE = "/v1"
@@ -101,7 +102,7 @@ def get_api_key():
         if method.lower() != 'api-key': return
         return touni(base64.b64decode(tob(data[4:])))
     except (ValueError, TypeError):
-        abort(401, HEADER_ERROR) 
+        abort(401, HEADER_ERROR)
 
 BASIC_ERROR = "Could not do basic authentication. Wrong username or password."
 API_KEY_ERROR = "Could not authenticate using the given api key."
@@ -205,6 +206,11 @@ def add_resource():
     return response_object({"data": {"attributes": resource, "type":"resource", "id": _id},
             "links": {"self":link}})
 
+# call css stylesheet
+@route('/schul_cloud_resources_server_tests/<filepath>')
+def server_static(filepath):
+    return static_file(filepath, root="")
+
 
 @get(BASE + "/resources/<_id>")
 def get_resource(_id):
@@ -215,7 +221,7 @@ def get_resource(_id):
     resource = resources.get(_id)
     if resource is None:
         abort(404, "The resource with the id \"{}\" could not be found.".format(_id))
-    return response_object({"data": {"attributes": resource, "id": _id, "type": "resource"}, 
+    return response_object({"data": {"attributes": resource, "id": _id, "type": "resource"},
                             "links": {"self": get_location_url(_id)}})
 
 
@@ -232,7 +238,7 @@ def get_resource_ids():
     test_jsonapi_header()
     resources = get_resources()
     response.content_type = 'application/vnd.api+json'
-    return response_object({"data": [{"type": "id", "id": _id} for _id in resources], 
+    return response_object({"data": [{"type": "id", "id": _id} for _id in resources],
                             "links": {"self": get_location_url("ids")}})
 
 
@@ -251,12 +257,9 @@ def get_help_page():
     """Display a help page for the users."""
     return """
     <html>
-<<<<<<< HEAD
-=======
       <head>
-       <link rel="stylesheet" type="text/css" href="stylesheet.css">
+       <link rel="stylesheet" type="text/css" href="/schul_cloud_resources_server_tests/stylesheet.css">
       </head>
->>>>>>> parent of 86b8f60... tried to call stylesheet but got error
       <body>
         <h1>Resources Test Server</h1>
         <p>
