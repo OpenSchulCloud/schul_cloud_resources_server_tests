@@ -1,9 +1,0 @@
-body{
-  background-color:black
-}
-h1{
-  color:blue;
-}
-
-/* these things are just tests, if the h1 is blue and the background is black
-we know that we have successfully called the stylesheet */
