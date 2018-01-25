@@ -209,7 +209,7 @@ def add_resource():
 # call css stylesheet
 @route('/schul_cloud_resources_server_tests/<filepath>')
 def server_static(filepath):
-    return static_file(filepath, root="")
+    return static_file(filepath, root=HERE)
 
 
 @get(BASE + "/resources/<_id>")

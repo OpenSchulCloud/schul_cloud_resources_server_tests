@@ -1,1 +1,9 @@
-body
+body{
+  background-color: black;
+}
+
+h1{
+  color:blue;
+}
+
+/* These are just tests to see if the stylesheet is being called, it's not actually going to be the style of the webpage */
